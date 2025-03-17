@@ -1,15 +1,15 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://10.89.240.73:5000/api/v1/",
+  baseURL: "http://10.89.240.73:5000/reservas/v1/",
   headers: {
     accept: "application/json",
   },
 });
 
 const sheets = {
-  postLogin: (user) => api.post("login/", user),
-  postCadastro: (user) => api.post("user/", user),
+  postLogin: (usuario) => api.post("login/", usuario),
+  postCadastro: (usuario) => api.post("user/", usuario),
 
  
 };

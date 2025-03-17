@@ -15,7 +15,7 @@ export default function Cadastro({ navigation }) {
     nomecompleto: "",
     cpf: "",
     email: "",
-    password: "",
+    senha: "",
   });
 
   async function handleCadastro() {
@@ -38,13 +38,9 @@ export default function Cadastro({ navigation }) {
         <TextInput
           placeholder="Nome"
           value={usuario.nomecompleto}
-          onChangeText={(value) => setUsuario({ ...usuario, nomecompleto: value })}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="E-mail"
-          value={usuario.email}
-          onChangeText={(value) => setUsuario({ ...usuario, email: value })}
+          onChangeText={(value) =>
+            setUsuario({ ...usuario, nomecompleto: value })
+          }
           style={styles.input}
         />
         <TextInput
@@ -54,9 +50,15 @@ export default function Cadastro({ navigation }) {
           style={styles.input}
         />
         <TextInput
+          placeholder="E-mail"
+          value={usuario.email}
+          onChangeText={(value) => setUsuario({ ...usuario, email: value })}
+          style={styles.input}
+        />
+        <TextInput
           placeholder="Senha"
-          value={usuario.password}
-          onChangeText={(value) => setUsuario({ ...usuario, password: value })}
+          value={usuario.senha}
+          onChangeText={(value) => setUsuario({ ...usuario, senha: value })}
           secureTextEntry
           style={styles.input}
         />
