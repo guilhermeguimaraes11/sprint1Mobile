@@ -35,36 +35,46 @@ export default function Cadastro({ navigation }) {
     <View style={styles.container}>
       <View style={styles.formContainer}>
         <Image source={require("../img/logosenai.png")} style={styles.logo} />
+
+        <Text style={styles.label}>Nome:</Text>
         <TextInput
-          placeholder="Nome"
+          placeholder="Nome Completo"
           value={usuario.nomecompleto}
           onChangeText={(value) =>
             setUsuario({ ...usuario, nomecompleto: value })
           }
           style={styles.input}
         />
+
+        <Text style={styles.label}>E-mail:</Text>
         <TextInput
-          placeholder="CPF"
-          value={usuario.cpf}
-          onChangeText={(value) => setUsuario({ ...usuario, cpf: value })}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="E-mail"
+          placeholder="Digite seu E-mail"
           value={usuario.email}
           onChangeText={(value) => setUsuario({ ...usuario, email: value })}
           style={styles.input}
         />
+
+        <Text style={styles.label}>CPF:</Text>
         <TextInput
-          placeholder="Senha"
+          placeholder="Digite seu CPF"
+          value={usuario.cpf}
+          onChangeText={(value) => setUsuario({ ...usuario, cpf: value })}
+          style={styles.input}
+        />
+
+        <Text style={styles.label}>Senha:</Text>
+        <TextInput
+          placeholder="Digite sua Senha"
           value={usuario.senha}
           onChangeText={(value) => setUsuario({ ...usuario, senha: value })}
           secureTextEntry
           style={styles.input}
         />
+
         <TouchableOpacity onPress={handleCadastro} style={styles.button}>
           <Text style={styles.buttonCadastrar}>Cadastrar-se</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           onPress={() => navigation.navigate("Login")}
           style={styles.link}
@@ -72,6 +82,9 @@ export default function Cadastro({ navigation }) {
           <Text style={styles.linklogin}>Já tem uma conta? Login</Text>
         </TouchableOpacity>
       </View>
+      <Text style={styles.footer}>
+        Desenvolvido por Guilherme Guimaraes, Hyago Gabriel e Leonardo Pedroso
+      </Text>
     </View>
   );
 }
@@ -85,8 +98,9 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   formContainer: {
-    width: "100%",
-    padding: 20,
+    width: "90%",
+    maxWidth: 400,
+    padding: 15,
     borderWidth: 2,
     borderColor: "#A80805",
     borderRadius: 10,
@@ -97,26 +111,31 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    width: 250,
-    height: 120,
+    width: 200,
+    height: 100,
     resizeMode: "contain",
     marginBottom: 20,
     alignSelf: "center",
   },
+  label: {
+    fontSize: 16,
+    color: "black",
+    marginBottom: 5,
+  },
   input: {
     width: "100%",
-    height: 50,
+    height: 45,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 10,
-    marginBottom: 20,
-    paddingHorizontal: 15,
+    marginBottom: 15,
+    paddingHorizontal: 10,
     backgroundColor: "#fff",
     fontSize: 16,
   },
   button: {
     width: "100%",
-    height: 50,
+    height: 45,
     backgroundColor: "#A80805",
     borderRadius: 10,
     justifyContent: "center",
@@ -136,5 +155,11 @@ const styles = StyleSheet.create({
   linklogin: {
     color: "#A80805",
     fontSize: 16,
+  },
+  footer: {
+    color: "black",
+    fontSize: 11,
+    textAlign: "center",
+    marginTop: 20,
   },
 });

@@ -37,14 +37,16 @@ export default function Login({ navigation }) {
       <View style={styles.formContainer}>
         <Image source={require("../img/logosenai.png")} style={styles.logo} />
 
+        <Text style={styles.label}>Email:</Text>
         <TextInput
-          placeholder="E-mail"
+          placeholder="Digite seu E-mail"
           value={usuario.email}
           onChangeText={(value) => setUsuario({ ...usuario, email: value })}
           style={styles.input}
         />
+        <Text style={styles.label}>Senha:</Text>
         <TextInput
-          placeholder="Senha"
+          placeholder="Digite sua Senha"
           value={usuario.senha}
           onChangeText={(value) => setUsuario({ ...usuario, senha: value })}
           secureTextEntry
@@ -130,19 +132,23 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 10,
     alignItems: "center",
+    
   },
   butoomCadastre: {
     color: "#A80805",
     fontSize: 16,
     textDecorationLine: "underline",
+    
   },
   bottomFooter: {
     width: "120%",
     padding: 10,
+    
   },
   footer: {
     color: "black",
     fontSize: 13,
     textAlign: "center",
+    
   },
 });
