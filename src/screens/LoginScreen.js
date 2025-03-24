@@ -9,11 +9,13 @@ import {
   Image,
 } from "react-native";
 import api from "../axios/axios";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function Login({ navigation }) {
   const [usuario, setUsuario] = useState({
     email: "",
     senha: "",
+    showPassword: false, // Controla a visibilidade da senha
   });
 
   async function handleLogin() {
@@ -45,19 +47,35 @@ export default function Login({ navigation }) {
           style={styles.input}
         />
         <Text style={styles.label}>Senha:</Text>
-        <TextInput
-          placeholder="Digite sua Senha"
-          value={usuario.senha}
-          onChangeText={(value) => setUsuario({ ...usuario, senha: value })}
-          secureTextEntry
-          style={styles.input}
-        />
-        <TouchableOpacity onPress={handleLogin} style={styles.button}>
+        <View style={styles.passwordContainer}>
+          <TextInput
+            placeholder="Digite sua Senha"
+            value={usuario.senha}
+            secureTextEntry={usuario.showPassword} // Controla a visibilidade
+            onChangeText={(value) => setUsuario({ ...usuario, senha: value })}
+            style={styles.input}
+          />
+          {/* Icone para mostrar ou ocultar a senha dentro do campo */}
+          <TouchableOpacity
+            onPress={() =>
+              setUsuario({ ...usuario, showPassword: !usuario.showPassword })
+            }
+            style={styles.eyeIcon}
+          >
+            <Ionicons
+              name={usuario.showPassword ? "eye-off" : "eye"}
+              size={24}
+              color="gray"
+            />
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity onPress={handleLogin} style={styles.buttonentrar}>
           <Text style={styles.buttonEntrar}>Entrar</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigation.navigate("Cadastro")}
-          style={styles.link}
+          style={styles.buttoncadastrese}
         >
           <Text style={styles.butoomCadastre}>Cadastre-se</Text>
         </TouchableOpacity>
@@ -82,7 +100,6 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: "100%",
-   
     padding: 20,
     borderWidth: 2,
     borderColor: "#A80805",
@@ -93,9 +110,7 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 2.5,
-    elevation: 5,
+   
   },
   logo: {
     width: 250,
@@ -115,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     fontSize: 16,
   },
-  button: {
+  buttonentrar: {
     width: "100%",
     height: 50,
     backgroundColor: "#A80805",
@@ -129,26 +144,29 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  link: {
+  buttoncadastrese: {
     marginTop: 10,
     alignItems: "center",
-    
   },
   butoomCadastre: {
     color: "#A80805",
     fontSize: 16,
-    textDecorationLine: "underline",
-    
   },
-  bottomFooter: {
-    width: "120%",
-    padding: 10,
-    
-  },
+ 
   footer: {
     color: "black",
     fontSize: 13,
     textAlign: "center",
-    
+  },
+
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
+  },
+  eyeIcon: {
+    position: "absolute",
+    right: 18,
+    top: 12, 
   },
 });
