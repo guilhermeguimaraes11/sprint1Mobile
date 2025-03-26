@@ -23,6 +23,8 @@ export default function Login({ navigation }) {
       (response) => {
         console.log(response.data.message);
         Alert.alert("OK", response.data.message);
+
+        navigation.navigate("Home");
       },
       (error) => {
         Alert.alert("Erro", error.response.data.error);
@@ -77,7 +79,7 @@ export default function Login({ navigation }) {
           onPress={() => navigation.navigate("Cadastro")}
           style={styles.buttoncadastrese}
         >
-          <Text style={styles.butoomCadastre}>Cadastre-se</Text>
+          <Text style={styles.butoomCadastre}>Não tem uma conta? Cadastre-se</Text>
         </TouchableOpacity>
       </View>
 
@@ -100,16 +102,13 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     width: "100%",
-    padding: 20,
+    padding: 15,
     borderWidth: 2,
     borderColor: "#A80805",
-    borderRadius: 10,
+    borderRadius: 15,
     backgroundColor: "#fd7c7c",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    
+    
    
   },
   logo: {

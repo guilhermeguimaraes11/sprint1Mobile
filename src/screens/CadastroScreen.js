@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons"; // Importe o Ionicons
 import api from "../axios/axios";
 
 export default function Cadastro({ navigation }) {
@@ -16,6 +17,7 @@ export default function Cadastro({ navigation }) {
     cpf: "",
     email: "",
     senha: "",
+    showPassword: false, // Controla a visibilidade da senha
   });
 
   async function handleCadastro() {
@@ -23,6 +25,8 @@ export default function Cadastro({ navigation }) {
       (response) => {
         console.log(response.data.message);
         Alert.alert("OK", response.data.message);
+
+        navigation.navigate("Home");
       },
       (error) => {
         Alert.alert("Erro", error.response.data.error);
@@ -63,13 +67,28 @@ export default function Cadastro({ navigation }) {
         />
 
         <Text style={styles.label}>Senha:</Text>
-        <TextInput
-          placeholder="Digite sua Senha"
-          value={usuario.senha}
-          onChangeText={(value) => setUsuario({ ...usuario, senha: value })}
-          secureTextEntry
-          style={styles.input}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            placeholder="Digite sua Senha"
+            value={usuario.senha}
+            onChangeText={(value) => setUsuario({ ...usuario, senha: value })}
+            secureTextEntry={usuario.showPassword} // Controla a visibilidade da senha
+            style={styles.input}
+          />
+          {/* Icone para mostrar ou ocultar a senha dentro do campo */}
+          <TouchableOpacity
+            onPress={() =>
+              setUsuario({ ...usuario, showPassword: !usuario.showPassword })
+            }
+            style={styles.eyeIcon}
+          >
+            <Ionicons
+              name={usuario.showPassword ? "eye-off" : "eye"}
+              size={24}
+              color="gray"
+            />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity onPress={handleCadastro} style={styles.button}>
           <Text style={styles.buttonCadastrar}>Cadastrar-se</Text>
@@ -79,7 +98,7 @@ export default function Cadastro({ navigation }) {
           onPress={() => navigation.navigate("Login")}
           style={styles.link}
         >
-          <Text style={styles.linklogin}>Já tem uma conta? Login</Text>
+          <Text style={styles.jatemumalogin}>Já tem uma conta? Login</Text>
         </TouchableOpacity>
       </View>
       <Text style={styles.footer}>
@@ -98,28 +117,24 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   formContainer: {
-    width: "90%",
-    maxWidth: 400,
+    width: "100%",
     padding: 15,
     borderWidth: 2,
     borderColor: "#A80805",
-    borderRadius: 10,
+    borderRadius: 15,
     backgroundColor: "#fd7c7c",
-    shadowOpacity: 0.2,
-    shadowRadius: 2.5,
-    elevation: 5,
+    
   },
 
   logo: {
-    width: 200,
-    height: 100,
+    width: 250,
+    height: 120,
     resizeMode: "contain",
     marginBottom: 20,
     alignSelf: "center",
   },
   label: {
     fontSize: 16,
-    color: "black",
     marginBottom: 5,
   },
   input: {
@@ -150,16 +165,22 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 10,
     alignItems: "center",
-    color: "#A80805",
   },
-  linklogin: {
+  jatemumalogin: {
     color: "#A80805",
     fontSize: 16,
   },
   footer: {
     color: "black",
-    fontSize: 11,
+    fontSize: 13,
     textAlign: "center",
     marginTop: 20,
+    
+  },
+
+  eyeIcon: {
+    position: "absolute",
+    right: 18,
+    top: 12,
   },
 });

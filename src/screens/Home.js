@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from "react-native";
 export default function Home() {
   return (
     <View style={styles.container}>
-      <Text style={styles.welcomeMessage}>Bem-vindo ao Home!</Text>
+      <Text style={styles.Msg}>Bem-vindo ao Home!</Text>
     </View>
   );
 }
@@ -16,8 +16,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#ffdcdc",
   },
-  welcomeMessage: {
-    fontSize: 24,
+  Msg: {
+    fontSize: 25,
     fontWeight: "bold",
     color: "#A80805",
   },
