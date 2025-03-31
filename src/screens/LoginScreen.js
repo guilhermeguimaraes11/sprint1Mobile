@@ -15,7 +15,7 @@ export default function Login({ navigation }) {
   const [usuario, setUsuario] = useState({
     email: "",
     senha: "",
-    showPassword: false, // Controla a visibilidade da senha
+    showPassword: false, 
   });
 
   async function handleLogin() {
@@ -52,7 +52,7 @@ export default function Login({ navigation }) {
           <TextInput
             placeholder="Digite sua Senha"
             value={usuario.senha}
-            secureTextEntry={usuario.showPassword} // Controla a visibilidade
+            secureTextEntry={usuario.showPassword} 
             onChangeText={(value) => setUsuario({ ...usuario, senha: value })}
             style={styles.input}
           />
