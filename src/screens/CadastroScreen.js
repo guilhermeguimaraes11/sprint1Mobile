@@ -8,11 +8,10 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; 
-import api from "../axios/axios"; 
+import { Ionicons } from "@expo/vector-icons";
+import api from "../axios/axios";
 
 export default function Cadastro({ navigation }) {
- 
   const [usuario, setUsuario] = useState({
     nomecompleto: "",
     cpf: "",
@@ -21,19 +20,18 @@ export default function Cadastro({ navigation }) {
     showPassword: false, //(oculta ou visível)
   });
 
-  
   async function handleCadastro() {
     // Envia os dados de cadastro para a API e trata a resposta
     await api.postCadastro(usuario).then(
       (response) => {
-        console.log(response.data.message); 
-        Alert.alert("OK", response.data.message); 
+        console.log(response.data.message);
+        Alert.alert("OK", response.data.message);
 
-        navigation.navigate("Home"); 
+        navigation.navigate("Home");
       },
       (error) => {
         Alert.alert("Erro", error.response.data.error); // Exibe um alerta caso ocorra erro
-        console.log(error); 
+        console.log(error);
       }
     );
   }
@@ -41,7 +39,6 @@ export default function Cadastro({ navigation }) {
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
-        
         <Image source={require("../img/logosenai.png")} style={styles.logo} />
 
         {/* Campo para nome completo */}
@@ -50,55 +47,51 @@ export default function Cadastro({ navigation }) {
           placeholder="Nome Completo"
           value={usuario.nomecompleto}
           onChangeText={(value) =>
-            setUsuario({ ...usuario, nomecompleto: value }) 
+            setUsuario({ ...usuario, nomecompleto: value })
           }
           style={styles.input}
         />
 
-        {/* Campo para e-mail */}
         <Text style={styles.label}>E-mail:</Text>
         <TextInput
           placeholder="Digite seu E-mail"
           value={usuario.email}
-          onChangeText={(value) => setUsuario({ ...usuario, email: value })} 
+          onChangeText={(value) => setUsuario({ ...usuario, email: value })}
           style={styles.input}
         />
 
-        {/* Campo para CPF */}
         <Text style={styles.label}>CPF:</Text>
         <TextInput
           placeholder="Digite seu CPF"
           value={usuario.cpf}
-          onChangeText={(value) => setUsuario({ ...usuario, cpf: value })} 
+          onChangeText={(value) => setUsuario({ ...usuario, cpf: value })}
           style={styles.input}
         />
 
-        {/* Campo para senha */}
         <Text style={styles.label}>Senha:</Text>
         <View style={styles.passwordContainer}>
           <TextInput
             placeholder="Digite sua Senha"
             value={usuario.senha}
-            onChangeText={(value) => setUsuario({ ...usuario, senha: value })} 
-            secureTextEntry={usuario.showPassword} 
+            onChangeText={(value) => setUsuario({ ...usuario, senha: value })}
+            secureTextEntry={usuario.showPassword}
             style={styles.input}
           />
           {/* Ícone para mostrar ou ocultar a senha */}
           <TouchableOpacity
             onPress={() =>
-              setUsuario({ ...usuario, showPassword: !usuario.showPassword }) 
+              setUsuario({ ...usuario, showPassword: !usuario.showPassword })
             }
             style={styles.eyeIcon}
           >
             <Ionicons
-              name={usuario.showPassword ? "eye-off" : "eye"} // Muda o ícone dependendo da visibilidade da senha
+              name={usuario.showPassword ? "eye-off" : "eye"} 
               size={24}
               color="gray"
             />
           </TouchableOpacity>
         </View>
 
-       
         <TouchableOpacity onPress={handleCadastro} style={styles.button}>
           <Text style={styles.buttonCadastrar}>Cadastrar-se</Text>
         </TouchableOpacity>
@@ -111,7 +104,6 @@ export default function Cadastro({ navigation }) {
         </TouchableOpacity>
       </View>
 
-     
       <Text style={styles.footer}>
         Desenvolvido por Guilherme Guimaraes, Hyago Gabriel e Leonardo Pedroso
       </Text>
@@ -119,87 +111,85 @@ export default function Cadastro({ navigation }) {
   );
 }
 
-
 const styles = StyleSheet.create({
-  
   container: {
     flex: 1,
-    justifyContent: "center", 
-    alignItems: "center", 
-    backgroundColor: "#ffdcdc", 
-    padding: 20, 
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#ffdcdc",
+    padding: 20,
   },
-  
+
   formContainer: {
-    width: "100%", 
-    padding: 15, 
-    borderWidth: 2, 
-    borderColor: "#A80805", 
-    borderRadius: 15, 
-    backgroundColor: "#fd7c7c", 
+    width: "100%",
+    padding: 15,
+    borderWidth: 2,
+    borderColor: "#A80805",
+    borderRadius: 15,
+    backgroundColor: "#fd7c7c",
   },
-  
+
   logo: {
-    width: 250, 
+    width: 250,
     height: 120,
     resizeMode: "contain",
-    marginBottom: 20, 
-    alignSelf: "center", 
+    marginBottom: 20,
+    alignSelf: "center",
   },
-  
+
   label: {
-    fontSize: 16, 
-    marginBottom: 5, 
+    fontSize: 16,
+    marginBottom: 5,
   },
-  
+
   input: {
-    width: "100%", // 
+    width: "100%", //
     height: 45,
-    borderWidth: 1, 
-    borderColor: "#ccc", 
-    borderRadius: 10, 
-    marginBottom: 15, 
-    paddingHorizontal: 10, 
-    backgroundColor: "#fff", 
-    fontSize: 16, 
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    backgroundColor: "#fff",
+    fontSize: 16,
   },
-  // Estilo do botão de cadastro
+
   button: {
-    width: "100%", 
-    height: 45, 
-    backgroundColor: "#A80805", 
-    borderRadius: 10, 
-    justifyContent: "center", 
-    alignItems: "center", 
-    marginBottom: 15, 
+    width: "100%",
+    height: 45,
+    backgroundColor: "#A80805",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
   },
-  
+
   buttonCadastrar: {
-    color: "white", 
-    fontSize: 18, 
-    fontWeight: "bold", 
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
   },
 
   link: {
-    marginTop: 10, 
-    alignItems: "center", 
+    marginTop: 10,
+    alignItems: "center",
   },
-  
+
   jatemumalogin: {
-    color: "#A80805", 
-    fontSize: 16, 
+    color: "#A80805",
+    fontSize: 16,
   },
-  
+
   footer: {
-    color: "black", 
-    fontSize: 13, 
-    textAlign: "center", 
-    marginTop: 20, 
+    color: "black",
+    fontSize: 13,
+    textAlign: "center",
+    marginTop: 20,
   },
-  
+
   eyeIcon: {
-    position: "absolute", 
+    position: "absolute",
     right: 18,
-    top: 12, 
+    top: 12,
   },
 });

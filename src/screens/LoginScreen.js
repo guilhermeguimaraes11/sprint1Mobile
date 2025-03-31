@@ -35,7 +35,6 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Footer Superior */}
       <View style={styles.topFooter}></View>
 
       <View style={styles.formContainer}>
@@ -57,7 +56,7 @@ export default function Login({ navigation }) {
             onChangeText={(value) => setUsuario({ ...usuario, senha: value })}
             style={styles.input}
           />
-          {/* Icone para mostrar ou ocultar a senha dentro do campo */}
+     
           <TouchableOpacity
             onPress={() =>
               setUsuario({ ...usuario, showPassword: !usuario.showPassword })
