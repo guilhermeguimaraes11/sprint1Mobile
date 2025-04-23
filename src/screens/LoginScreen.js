@@ -23,8 +23,9 @@ export default function Login({ navigation }) {
       (response) => {
         console.log(response.data.message);
         Alert.alert("OK", response.data.message);
-
-        navigation.navigate("Home");
+  
+        // Nome exato do Stack.Screen
+        navigation.navigate("ListaDeSalas");
       },
       (error) => {
         Alert.alert("Erro", error.response.data.error);
