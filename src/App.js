@@ -16,7 +16,7 @@ export default function App() {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Cadastro" component={CadastroScreen} />
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="ListaDeSalas" component={ListagemSalas} />
+        <Stack.Screen name="ListagemDeSalas" component={ListagemSalas} />
      
       </Stack.Navigator>
     </NavigationContainer>

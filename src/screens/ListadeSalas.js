@@ -1,31 +1,36 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, SafeAreaView, Modal, TouchableOpacity, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';  // Não se esqueça de importar o useEffect
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  SafeAreaView,
+  Modal,
+  TouchableOpacity,
+  Button,
+} from 'react-native';
+import api from '../axios/axios'; // Importando a instância do axios
 
-const salas = [
-  { nome: 'Sala de Reuniões 1', descricao: 'Sala de reuniões equipada para conferências', bloco: 'A', tipo: 'Sala', capacidade: 20 },
-  { nome: 'Laboratório de Informática', descricao: 'Laboratório com computadores e softwares de desenvolvimento', bloco: 'B', tipo: 'Laboratório', capacidade: 30 },
-  { nome: 'Oficina Mecânica', descricao: 'Oficina com ferramentas para manutenção de veículos', bloco: 'C', tipo: 'Oficina', capacidade: 25 },
-  { nome: 'Laboratório de Química', descricao: 'Laboratório de experimentos químicos', bloco: 'D', tipo: 'Laboratório', capacidade: 15 },
-  { nome: 'Sala de Aula 101', descricao: 'Sala de aula equipada com projetor e quadro branco', bloco: 'E', tipo: 'Sala', capacidade: 40 },
-  { nome: 'Auditório Principal', descricao: 'Auditório para eventos e palestras', bloco: 'F', tipo: 'Sala', capacidade: 100 },
-  { nome: 'Sala de Estudos', descricao: 'Espaço silencioso para estudos individuais', bloco: 'G', tipo: 'Sala', capacidade: 12 },
-  { nome: 'Laboratório de Física', descricao: 'Laboratório para experimentos de física', bloco: 'H', tipo: 'Laboratório', capacidade: 18 },
-  { nome: 'Oficina de Marcenaria', descricao: 'Oficina equipada com ferramentas de marcenaria', bloco: 'I', tipo: 'Oficina', capacidade: 20 },
-  { nome: 'Sala de Videoconferências', descricao: 'Sala equipada para videoconferências e apresentações remotas', bloco: 'J', tipo: 'Sala', capacidade: 10 },
-  { nome: 'Sala de Treinamento', descricao: 'Sala de treinamento para cursos corporativos', bloco: 'K', tipo: 'Sala', capacidade: 25 },
-  { nome: 'Laboratório de Biologia', descricao: 'Laboratório para experimentos biológicos', bloco: 'L', tipo: 'Laboratório', capacidade: 16 },
-  { nome: 'Sala de Projetos', descricao: 'Sala equipada para reuniões de equipe e desenvolvimento de projetos', bloco: 'M', tipo: 'Sala', capacidade: 18 },
-  { nome: 'Sala Multimídia', descricao: 'Sala equipada com recursos audiovisuais e multimídia', bloco: 'N', tipo: 'Sala', capacidade: 35 },
-  { nome: 'Oficina de Costura', descricao: 'Oficina com máquinas e ferramentas para costura', bloco: 'O', tipo: 'Oficina', capacidade: 15 },
-  { nome: 'Laboratório de Eletrônica', descricao: 'Laboratório para experimentos e montagem de circuitos eletrônicos', bloco: 'P', tipo: 'Laboratório', capacidade: 20 },
-  { nome: 'Sala VIP', descricao: 'Sala exclusiva para reuniões de alto nível', bloco: 'Q', tipo: 'Sala', capacidade: 8 },
-  { nome: 'Oficina de Soldagem', descricao: 'Oficina equipada com maquinário para soldagem', bloco: 'R', tipo: 'Oficina', capacidade: 12 },
-  { nome: 'Laboratório de Culinária', descricao: 'Laboratório com equipamentos para aulas práticas de culinária', bloco: 'S', tipo: 'Laboratório', capacidade: 12 },
-];
 
-export default function ListaDeSalas() {
+export default function ListaDeSalas({ navigation }) {
+  const [salas, setSalas] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSala, setSelectedSala] = useState(null);
+
+  // Função assíncrona para buscar as salas
+  async function getSalas() {
+    try {
+      const response = await api.get('/Salas'); // Certifique-se de que a URL está correta
+      setSalas(response.data.salas);  // Supondo que a resposta tenha uma propriedade `salas`
+    } catch (error) {
+      console.error("Erro ao buscar salas", error);
+    }
+  }
+
+  // useEffect para chamar a função getSalas quando o componente for montado
+  useEffect(() => {
+    getSalas();
+  }, []); // O array vazio significa que a função será chamada apenas uma vez quando o componente for montado
 
   const openModal = (item) => {
     setSelectedSala(item);
@@ -38,15 +43,18 @@ export default function ListaDeSalas() {
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity onPress={() => openModal(item)}>
-      <View style={styles.row}>
-        <Text style={styles.cell}>{item.nome}</Text>
-        <Text style={styles.cell}>{item.descricao}</Text>
-        <Text style={styles.cell}>{item.bloco}</Text>
-        <Text style={styles.cell}>{item.tipo}</Text>
-        <Text style={styles.cell}>{item.capacidade}</Text>
+    <View style={styles.row}>
+      <Text style={styles.cell}>{item.nome}</Text>
+      <Text style={styles.cell}>{item.descricao}</Text>
+      <Text style={styles.cell}>{item.bloco}</Text>
+      <Text style={styles.cell}>{item.tipo}</Text>
+      <Text style={styles.cell}>{item.capacidade}</Text>
+      <View style={styles.cell}>
+        <TouchableOpacity onPress={() => openModal(item)} style={styles.actionButton}>
+          <Text style={styles.actionButtonText}>Reservar</Text>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
   return (
@@ -57,6 +65,7 @@ export default function ListaDeSalas() {
         <Text style={styles.headerText}>BLOCO</Text>
         <Text style={styles.headerText}>TIPO</Text>
         <Text style={styles.headerText}>CAPACIDADE</Text>
+        <Text style={styles.headerText}>AÇÕES</Text>
       </View>
 
       <FlatList
@@ -77,8 +86,16 @@ export default function ListaDeSalas() {
           visible={modalVisible}
           onRequestClose={closeModal}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={closeModal}
+          >
+            <TouchableOpacity
+              activeOpacity={1}
+              style={styles.modalContent}
+              onPress={(e) => e.stopPropagation()}
+            >
               <Text style={styles.modalTitle}>Reserva de Sala</Text>
               <Text>Nome: {selectedSala.nome}</Text>
               <Text>Descrição: {selectedSala.descricao}</Text>
@@ -86,17 +103,19 @@ export default function ListaDeSalas() {
               <Text>Tipo: {selectedSala.tipo}</Text>
               <Text>Capacidade: {selectedSala.capacidade}</Text>
 
-              <TouchableOpacity style={styles.reserveButton} onPress={() => {
-                alert('Reserva realizada com sucesso!');
-                closeModal();
-              }}>
+              <TouchableOpacity
+                style={styles.reserveButton}
+                onPress={() => {
+                  alert('Reserva realizada com sucesso!');
+                  closeModal();
+                }}
+              >
                 <Text style={styles.reserveButtonText}>Confirmar Reserva</Text>
-                
               </TouchableOpacity>
 
               <Button title="Cancelar" onPress={closeModal} />
-            </View>
-          </View>
+            </TouchableOpacity>
+          </TouchableOpacity>
         </Modal>
       )}
     </SafeAreaView>
@@ -131,6 +150,8 @@ const styles = StyleSheet.create({
   },
   cell: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     textAlign: 'center',
     fontSize: 12,
     color: '#000',
@@ -171,6 +192,18 @@ const styles = StyleSheet.create({
   },
   reserveButtonText: {
     color: 'white',
+    fontWeight: 'bold',
+  },
+  actionButton: {
+    backgroundColor: '#D32F2F',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+    alignSelf: 'center',
+  },
+  actionButtonText: {
+    color: 'white',
+    fontSize: 12,
     fontWeight: 'bold',
   },
 });

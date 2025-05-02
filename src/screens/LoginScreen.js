@@ -25,7 +25,7 @@ export default function Login({ navigation }) {
         Alert.alert("OK", response.data.message);
   
         // Nome exato do Stack.Screen
-        navigation.navigate("ListaDeSalas");
+        navigation.navigate("ListagemDeSalas");
       },
       (error) => {
         Alert.alert("Erro", error.response.data.error);
@@ -75,8 +75,9 @@ export default function Login({ navigation }) {
         <TouchableOpacity onPress={handleLogin} style={styles.buttonentrar}>
           <Text style={styles.buttonEntrar}>Entrar</Text>
         </TouchableOpacity>
+        
         <TouchableOpacity
-          onPress={() => navigation.navigate("Cadastro")}
+          onPress={() => navigation.navigate("ListagemDeSalas")}
           style={styles.buttoncadastrese}
         >
           <Text style={styles.butoomCadastre}>Não tem uma conta? Cadastre-se</Text>
