@@ -1,5 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
+import api from "../axios/axios"; // Importando a instância do axios
 
 export default function Home() {
   return (

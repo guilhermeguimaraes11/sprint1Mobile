@@ -77,7 +77,7 @@ export default function Login({ navigation }) {
         </TouchableOpacity>
         
         <TouchableOpacity
-          onPress={() => navigation.navigate("ListagemDeSalas")}
+          onPress={() => navigation.navigate("Cadastro")}
           style={styles.buttoncadastrese}
         >
           <Text style={styles.butoomCadastre}>Não tem uma conta? Cadastre-se</Text>
