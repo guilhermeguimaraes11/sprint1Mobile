@@ -26,7 +26,6 @@ export default function Cadastro({ navigation }) {
       (response) => {
         console.log(response.data.message);
         Alert.alert("OK", response.data.message);
-
         navigation.navigate("Home");
       },
       (error) => {

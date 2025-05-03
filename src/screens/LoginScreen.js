@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import api from "../axios/axios";
 import { Ionicons } from "@expo/vector-icons";
+import asyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login({ navigation }) {
   const [usuario, setUsuario] = useState({
@@ -23,9 +24,8 @@ export default function Login({ navigation }) {
       (response) => {
         console.log(response.data.message);
         Alert.alert("OK", response.data.message);
-  
-        // Nome exato do Stack.Screen
-        navigation.navigate("ListagemDeSalas");
+        asyncStorage.setItem("idUsuario", response.data.user.id_usuario.toString());
+        navigation.navigate("ListaDeSalas");
       },
       (error) => {
         Alert.alert("Erro", error.response.data.error);
