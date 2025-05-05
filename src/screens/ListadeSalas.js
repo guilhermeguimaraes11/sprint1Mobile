@@ -10,22 +10,31 @@ import {
   TextInput,
 } from "react-native";
 import api from "../axios/axios";
-import DateTimePicker from "@react-native-community/datetimepicker";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import CalendarPicker from "react-native-calendar-picker";
+
 
 export default function ListaDeSalas({ navigation }) {
   const [salas, setSalas] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSala, setSelectedSala] = useState(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showStartTimePicker, setShowStartTimePicker] = useState(false);
-  const [showEndTimePicker, setShowEndTimePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
   const [searchText, setSearchText] = useState("");
-  const [selectedStartDate, setSelectedStartDate] = useState(null);
+
+  const verificarDisponibilidade = async (sala) => {
+    try {
+      const hoje = new Date().toISOString().split("T")[0]; // Formato: YYYY-MM-DD
+      const response = await api.getDisponibilidadeSala(sala.id_sala, hoje);
+      alert(`Disponibilidade em ${hoje}: ${response.data.disponivel ? "Disponível" : "Indisponível"}`);
+    } catch (error) {
+      console.error("Erro ao verificar disponibilidade", error);
+      alert(error.response?.data?.error || "Erro ao verificar disponibilidade.");
+    }
+  };
+  
+  
 
   async function getSalas() {
     try {
@@ -79,9 +88,17 @@ export default function ListaDeSalas({ navigation }) {
         >
           <Text style={styles.actionButtonText}>Reservar</Text>
         </TouchableOpacity>
+        
+        <TouchableOpacity
+          onPress={() => verificarDisponibilidade(item)}
+          style={[styles.actionButton, { marginTop: 5, backgroundColor: "#9C27B0" }]}
+        >
+          <Text style={styles.actionButtonText}>Disponibilidade</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
+  
 
   return (
     <SafeAreaView style={styles.container}>

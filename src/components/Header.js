@@ -17,9 +17,10 @@ export default function Header({ title, onLogout }) {
 
 const styles = StyleSheet.create({
   header: {
+    padding:0 ,
     backgroundColor: "#D32F2F",
     paddingVertical: 20,
-    width:"150%",
+    width:"105%",
     paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",

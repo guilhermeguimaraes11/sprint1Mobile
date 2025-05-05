@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#ffdcdc",
-    padding: 20,
+    padding: 0,
   },
   formContainer: {
     width: "100%",
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: "center",
     width:"100%",
-    padding: 10,
+    padding: 23,
     backgroundColor: "#D32F2F",
     alignItems: "center",
   },

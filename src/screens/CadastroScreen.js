@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import api from "../axios/axios";
+import Header from "../components/Header"; // Importa o Header
 
 export default function Cadastro({ navigation }) {
   const [usuario, setUsuario] = useState({
@@ -37,6 +38,7 @@ export default function Cadastro({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <Header title="Cadastro" />
       <View style={styles.formContainer}>
         <Image source={require("../img/logosenai.png")} style={styles.logo} />
 
@@ -113,10 +115,10 @@ export default function Cadastro({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#ffdcdc",
-    padding: 20,
+    padding: 0,
   },
 
   formContainer: {
@@ -183,7 +185,10 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: 13,
     textAlign: "center",
-    marginTop: 20,
+    width:"100%",
+    padding: 23,
+    backgroundColor: "#D32F2F",
+    alignItems: "center",
   },
 
   eyeIcon: {
