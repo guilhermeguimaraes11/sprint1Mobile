@@ -157,6 +157,9 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: 13,
     textAlign: "center",
+    padding: 10,
+    backgroundColor: "#D32F2F",
+    alignItems: "center",
   },
 
   passwordContainer: {

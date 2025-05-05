@@ -33,7 +33,7 @@ export default function ListaDeSalas({ navigation }) {
       console.error("Erro ao buscar salas", error);
       alert(error.response?.data?.error || "Erro inesperado");
     }
-  }  
+  }
 
   useEffect(() => {
     getSalas();
@@ -47,6 +47,16 @@ export default function ListaDeSalas({ navigation }) {
   const closeModal = () => {
     setModalVisible(false);
     setSelectedSala(null);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("idUsuario");
+      alert("Você foi desconectado.");
+      navigation.navigate("Login");
+    } catch (error) {
+      alert("Erro ao tentar deslogar. Tente novamente.");
+    }
   };
 
   const filteredSalas = salas.filter((sala) =>
@@ -73,7 +83,16 @@ export default function ListaDeSalas({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      {/* Header personalizado com botão de logout */}
+      <View style={styles.customHeader}>
+        <Text style={styles.headerTitle}>Lista de Salas</Text>
+        <TouchableOpacity style={styles.headerLogoutButton} onPress={handleLogout}>
+          <Text style={styles.headerLogoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Títulos da tabela */}
+      <View style={styles.headerRow}>
         <Text style={styles.headerText}>NOME</Text>
         <Text style={styles.headerText}>DESCRIÇÃO</Text>
         <Text style={styles.headerText}>BLOCO</Text>
@@ -82,7 +101,6 @@ export default function ListaDeSalas({ navigation }) {
         <Text style={styles.headerText}>AÇÕES</Text>
       </View>
 
-      {/* Barra de busca */}
       <TextInput
         placeholder="Buscar sala"
         style={styles.searchInput}
@@ -93,7 +111,7 @@ export default function ListaDeSalas({ navigation }) {
       <FlatList
         data={filteredSalas}
         renderItem={renderItem}
-        keyExtractor={(item, index) => item.id_sala.toString()}
+        keyExtractor={(item) => item.id_sala.toString()}
       />
 
       <View style={styles.footer}>
@@ -102,6 +120,7 @@ export default function ListaDeSalas({ navigation }) {
         </Text>
       </View>
 
+      {/* Modal de Reserva */}
       {selectedSala && (
         <Modal
           transparent={true}
@@ -186,15 +205,7 @@ export default function ListaDeSalas({ navigation }) {
                   display="default"
                   onChange={(event, time) => {
                     setShowEndTimePicker(false);
-                    if (time) {
-                      if (time < startTime) {
-                        alert(
-                          "O horário de término não pode ser anterior ao horário de início."
-                        );
-                        return;
-                      }
-                      setEndTime(time);
-                    }
+                    if (time) setEndTime(time);
                   }}
                 />
               )}
@@ -210,13 +221,12 @@ export default function ListaDeSalas({ navigation }) {
                     }
 
                     const reserva = {
-                      data: selectedDate.toISOString().split("T")[0], // yyyy-mm-dd
-                      horario_inicio: startTime.toTimeString().split(" ")[0], // hh:mm:ss
-                      horario_fim: endTime.toTimeString().split(" ")[0], // hh:mm:ss
+                      data: selectedDate.toISOString().split("T")[0],
+                      horario_inicio: startTime.toTimeString().split(" ")[0],
+                      horario_fim: endTime.toTimeString().split(" ")[0],
                       fk_id_sala: selectedSala.id_sala,
                       fk_id_usuario: parseInt(idUsuario),
                     };
-                    console.log(reserva);
 
                     const response = await api.postReserva(reserva);
                     alert(response.data.message);
@@ -248,7 +258,31 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFEBEE",
   },
-  header: {
+  customHeader: {
+    flexDirection: "row",
+    backgroundColor: "#D32F2F",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    paddingVertical: 15,
+  },
+  headerTitle: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  headerLogoutButton: {
+    backgroundColor: "#B71C1C",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 5,
+  },
+  headerLogoutText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  headerRow: {
     flexDirection: "row",
     backgroundColor: "#D32F2F",
     paddingVertical: 10,
