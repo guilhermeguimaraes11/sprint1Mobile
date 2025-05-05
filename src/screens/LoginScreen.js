@@ -11,12 +11,13 @@ import {
 import api from "../axios/axios";
 import { Ionicons } from "@expo/vector-icons";
 import asyncStorage from "@react-native-async-storage/async-storage";
+import Header from "../components/Header"; // Importa o Header
 
 export default function Login({ navigation }) {
   const [usuario, setUsuario] = useState({
     email: "",
     senha: "",
-    showPassword: false, 
+    showPassword: false,
   });
 
   async function handleLogin() {
@@ -36,7 +37,8 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.topFooter}></View>
+      {/* Header com título "Login" */}
+      <Header title="Login" />
 
       <View style={styles.formContainer}>
         <Image source={require("../img/logosenai.png")} style={styles.logo} />
@@ -53,11 +55,11 @@ export default function Login({ navigation }) {
           <TextInput
             placeholder="Digite sua Senha"
             value={usuario.senha}
-            secureTextEntry={usuario.showPassword} 
+            secureTextEntry={usuario.showPassword}
             onChangeText={(value) => setUsuario({ ...usuario, senha: value })}
             style={styles.input}
           />
-     
+
           <TouchableOpacity
             onPress={() =>
               setUsuario({ ...usuario, showPassword: !usuario.showPassword })
@@ -75,7 +77,7 @@ export default function Login({ navigation }) {
         <TouchableOpacity onPress={handleLogin} style={styles.buttonentrar}>
           <Text style={styles.buttonEntrar}>Entrar</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           onPress={() => navigation.navigate("Cadastro")}
           style={styles.buttoncadastrese}
@@ -108,9 +110,6 @@ const styles = StyleSheet.create({
     borderColor: "#A80805",
     borderRadius: 15,
     backgroundColor: "#fd7c7c",
-    
-    
-   
   },
   logo: {
     width: 250,
@@ -152,11 +151,11 @@ const styles = StyleSheet.create({
     color: "#A80805",
     fontSize: 16,
   },
- 
   footer: {
     color: "black",
     fontSize: 13,
     textAlign: "center",
+    width:"100%",
     padding: 10,
     backgroundColor: "#D32F2F",
     alignItems: "center",
@@ -170,6 +169,6 @@ const styles = StyleSheet.create({
   eyeIcon: {
     position: "absolute",
     right: 18,
-    top: 12, 
+    top: 12,
   },
 });

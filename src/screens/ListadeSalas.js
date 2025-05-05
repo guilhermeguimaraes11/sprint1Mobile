@@ -12,6 +12,7 @@ import {
 import api from "../axios/axios";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CalendarPicker from "react-native-calendar-picker";
 
 export default function ListaDeSalas({ navigation }) {
   const [salas, setSalas] = useState([]);
@@ -24,6 +25,7 @@ export default function ListaDeSalas({ navigation }) {
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
   const [searchText, setSearchText] = useState("");
+  const [selectedStartDate, setSelectedStartDate] = useState(null);
 
   async function getSalas() {
     try {
@@ -86,7 +88,10 @@ export default function ListaDeSalas({ navigation }) {
       {/* Header personalizado com botão de logout */}
       <View style={styles.customHeader}>
         <Text style={styles.headerTitle}>Lista de Salas</Text>
-        <TouchableOpacity style={styles.headerLogoutButton} onPress={handleLogout}>
+        <TouchableOpacity
+          style={styles.headerLogoutButton}
+          onPress={handleLogout}
+        >
           <Text style={styles.headerLogoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
@@ -141,74 +146,29 @@ export default function ListaDeSalas({ navigation }) {
               <Text>Tipo: {selectedSala.tipo}</Text>
               <Text>Capacidade: {selectedSala.capacidade}</Text>
 
-              <Text style={styles.label}>Data da Reserva:</Text>
-              <TouchableOpacity
-                onPress={() => setShowDatePicker(true)}
-                style={styles.reserveButton}
-              >
-                <Text style={styles.reserveButtonText}>
-                  {selectedDate.toLocaleDateString()}
-                </Text>
-              </TouchableOpacity>
-              {showDatePicker && (
-                <DateTimePicker
-                  value={selectedDate}
-                  mode="date"
-                  display="default"
-                  onChange={(event, date) => {
-                    setShowDatePicker(false);
-                    if (date) setSelectedDate(date);
-                  }}
-                />
-              )}
+              <Text style={styles.label}>Data da Reserva (YYYY-MM-DD):</Text>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="2025-05-06"
+                value={selectedDate}
+                onChangeText={(text) => setSelectedDate(text)}
+              />
 
-              <Text style={styles.label}>Horário de Início:</Text>
-              <TouchableOpacity
-                onPress={() => setShowStartTimePicker(true)}
-                style={styles.reserveButton}
-              >
-                <Text style={styles.reserveButtonText}>
-                  {startTime.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </Text>
-              </TouchableOpacity>
-              {showStartTimePicker && (
-                <DateTimePicker
-                  value={startTime}
-                  mode="time"
-                  display="default"
-                  onChange={(event, time) => {
-                    setShowStartTimePicker(false);
-                    if (time) setStartTime(time);
-                  }}
-                />
-              )}
+              <Text style={styles.label}>Horário de Início (HH:MM):</Text>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="08:00"
+                value={startTime}
+                onChangeText={(text) => setStartTime(text)}
+              />
 
-              <Text style={styles.label}>Horário de Fim:</Text>
-              <TouchableOpacity
-                onPress={() => setShowEndTimePicker(true)}
-                style={styles.reserveButton}
-              >
-                <Text style={styles.reserveButtonText}>
-                  {endTime.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </Text>
-              </TouchableOpacity>
-              {showEndTimePicker && (
-                <DateTimePicker
-                  value={endTime}
-                  mode="time"
-                  display="default"
-                  onChange={(event, time) => {
-                    setShowEndTimePicker(false);
-                    if (time) setEndTime(time);
-                  }}
-                />
-              )}
+              <Text style={styles.label}>Horário de Fim (HH:MM):</Text>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="10:00"
+                value={endTime}
+                onChangeText={(text) => setEndTime(text)}
+              />
 
               <TouchableOpacity
                 style={styles.reserveButton}
@@ -221,9 +181,9 @@ export default function ListaDeSalas({ navigation }) {
                     }
 
                     const reserva = {
-                      data: selectedDate.toISOString().split("T")[0],
-                      horario_inicio: startTime.toTimeString().split(" ")[0],
-                      horario_fim: endTime.toTimeString().split(" ")[0],
+                      data: selectedDate,
+                      horario_inicio: startTime,
+                      horario_fim: endTime,
                       fk_id_sala: selectedSala.id_sala,
                       fk_id_usuario: parseInt(idUsuario),
                     };
