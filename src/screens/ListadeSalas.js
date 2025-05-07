@@ -166,7 +166,7 @@ export default function ListaDeSalas({ navigation }) {
               <Text style={styles.label}>Data da Reserva (YYYY-MM-DD):</Text>
               <TextInput
                 style={styles.searchInput}
-                placeholder="2025-05-06"
+                placeholder="Ex:2025-05-06"
                 value={selectedDate}
                 onChangeText={(text) => setSelectedDate(text)}
               />
@@ -174,7 +174,7 @@ export default function ListaDeSalas({ navigation }) {
               <Text style={styles.label}>Horário de Início (HH:MM):</Text>
               <TextInput
                 style={styles.searchInput}
-                placeholder="08:00"
+                placeholder="Ex: 08:00"
                 value={startTime}
                 onChangeText={(text) => setStartTime(text)}
               />
@@ -182,7 +182,7 @@ export default function ListaDeSalas({ navigation }) {
               <Text style={styles.label}>Horário de Fim (HH:MM):</Text>
               <TextInput
                 style={styles.searchInput}
-                placeholder="10:00"
+                placeholder="Ex: 10:00"
                 value={endTime}
                 onChangeText={(text) => setEndTime(text)}
               />
