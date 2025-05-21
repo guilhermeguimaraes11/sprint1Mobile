@@ -5,6 +5,7 @@ import LoginScreen from "./screens/LoginScreen";
 import CadastroScreen from "./screens/CadastroScreen";
 import Home from "./screens/Home";
 import ListadeSalas from "./screens/ListadeSalas";
+import ProfileScreen from "./screens/ProfileScreen";
 
 
 const Stack = createStackNavigator();
@@ -17,6 +18,7 @@ export default function App() {
         <Stack.Screen name="Cadastro" component={CadastroScreen} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="ListaDeSalas" component={ListadeSalas} />
+        <Stack.Screen name="Perfil" component={ProfileScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

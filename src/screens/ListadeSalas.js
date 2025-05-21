@@ -9,10 +9,9 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons"; // Importa o ícone
 import api from "../axios/axios";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 
 export default function ListaDeSalas({ navigation }) {
   const [salas, setSalas] = useState([]);
@@ -25,16 +24,18 @@ export default function ListaDeSalas({ navigation }) {
 
   const verificarDisponibilidade = async (sala) => {
     try {
-      const hoje = new Date().toISOString().split("T")[0]; // Formato: YYYY-MM-DD
+      const hoje = new Date().toISOString().split("T")[0];
       const response = await api.getDisponibilidadeSala(sala.id_sala, hoje);
-      alert(`Disponibilidade em ${hoje}: ${response.data.disponivel ? "Disponível" : "Indisponível"}`);
+      alert(
+        `Disponibilidade em ${hoje}: ${
+          response.data.disponivel ? "Disponível" : "Indisponível"
+        }`
+      );
     } catch (error) {
       console.error("Erro ao verificar disponibilidade", error);
       alert(error.response?.data?.error || "Erro ao verificar disponibilidade.");
     }
   };
-  
-  
 
   async function getSalas() {
     try {
@@ -88,7 +89,7 @@ export default function ListaDeSalas({ navigation }) {
         >
           <Text style={styles.actionButtonText}>Reservar</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           onPress={() => verificarDisponibilidade(item)}
           style={[styles.actionButton, { marginTop: 5, backgroundColor: "#9C27B0" }]}
@@ -98,19 +99,26 @@ export default function ListaDeSalas({ navigation }) {
       </View>
     </View>
   );
-  
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header personalizado com botão de logout */}
+      {/* Header personalizado com botão de perfil e logout */}
       <View style={styles.customHeader}>
         <Text style={styles.headerTitle}>Lista de Salas</Text>
-        <TouchableOpacity
-          style={styles.headerLogoutButton}
-          onPress={handleLogout}
-        >
-          <Text style={styles.headerLogoutText}>Logout</Text>
-        </TouchableOpacity>
+
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <TouchableOpacity
+            style={{ marginRight: 15 }}
+            onPress={() => navigation.navigate("Perfil")}
+            accessibilityLabel="Ir para perfil"
+          >
+            <MaterialIcons name="account-circle" size={28} color="white" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.headerLogoutButton} onPress={handleLogout}>
+            <Text style={styles.headerLogoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Títulos da tabela */}
@@ -216,10 +224,7 @@ export default function ListaDeSalas({ navigation }) {
                 <Text style={styles.reserveButtonText}>Confirmar Reserva</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.reserveButton}
-                onPress={closeModal}
-              >
+              <TouchableOpacity style={styles.reserveButton} onPress={closeModal}>
                 <Text style={styles.reserveButtonText}>Cancelar</Text>
               </TouchableOpacity>
             </TouchableOpacity>
