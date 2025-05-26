@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import api from "../axios/axios";
 import { Ionicons } from "@expo/vector-icons";
-import asyncStorage from "@react-native-async-storage/async-storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../components/Header"; // Importa o Header
 
 export default function Login({ navigation }) {
@@ -20,20 +20,26 @@ export default function Login({ navigation }) {
     showPassword: false,
   });
 
-  async function handleLogin() {
-    await api.postLogin(usuario).then(
-      (response) => {
-        console.log(response.data.message);
-        Alert.alert("OK", response.data.message);
-        asyncStorage.setItem("idUsuario", response.data.user.id_usuario.toString());
-        navigation.navigate("ListaDeSalas");
-      },
-      (error) => {
-        Alert.alert("Erro", error.response.data.error);
-        console.log(error);
-      }
-    );
-  }
+ async function handleLogin() {
+  await api.postLogin(usuario).then(
+    (response) => {
+      console.log(response.data.message);
+      Alert.alert("OK", response.data.message);
+      console.log("PT", response.data.token);
+      AsyncStorage.setItem("idUsuario", response.data.user.id_usuario.toString());
+      AsyncStorage.setItem("authorization", response.data.token);
+      // Salvar nome, email e CPF aqui:
+      AsyncStorage.setItem("nome", response.data.user.nomecompleto);
+      AsyncStorage.setItem("email", response.data.user.email);
+      AsyncStorage.setItem("cpf", response.data.user.cpf);
+      navigation.navigate("ListaDeSalas");
+    },
+    (error) => {
+      Alert.alert("Erro", error.response.data.error);
+      console.log(error);
+    }
+  );
+}
 
   return (
     <View style={styles.container}>

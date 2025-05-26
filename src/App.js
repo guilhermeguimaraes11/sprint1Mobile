@@ -6,6 +6,7 @@ import CadastroScreen from "./screens/CadastroScreen";
 import Home from "./screens/Home";
 import ListadeSalas from "./screens/ListadeSalas";
 import ProfileScreen from "./screens/ProfileScreen";
+import EditarReserva from './screens/EditarReserva';
 
 
 const Stack = createStackNavigator();
@@ -19,6 +20,7 @@ export default function App() {
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="ListaDeSalas" component={ListadeSalas} />
         <Stack.Screen name="Perfil" component={ProfileScreen}/>
+        <Stack.Screen name="EditarReserva" component={EditarReserva}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

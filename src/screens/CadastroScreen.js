@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import api from "../axios/axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../components/Header"; // Importa o Header
 
 export default function Cadastro({ navigation }) {
@@ -26,6 +27,7 @@ export default function Cadastro({ navigation }) {
     await api.postCadastro(usuario).then(
       (response) => {
         console.log(response.data.message);
+        AsyncStorage.setItem("token", response.data.token)
         Alert.alert("OK", response.data.message);
         navigation.navigate("Home");
       },

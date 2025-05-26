@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   Alert,
   TouchableOpacity,
@@ -13,50 +12,29 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function Perfil({ navigation }) {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
+  const [cpf, setCpf] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Carrega dados salvos no AsyncStorage ao abrir a tela
   useEffect(() => {
     const carregarDados = async () => {
       setLoading(true);
       try {
         const nomeSalvo = await AsyncStorage.getItem("nome");
         const emailSalvo = await AsyncStorage.getItem("email");
-        const senhaSalva = await AsyncStorage.getItem("senha");
+        const cpfSalvo = await AsyncStorage.getItem("cpf");
 
         if (nomeSalvo) setNome(nomeSalvo);
         if (emailSalvo) setEmail(emailSalvo);
-        if (senhaSalva) setSenha(senhaSalva);
+        if (cpfSalvo) setCpf(cpfSalvo);
       } catch (error) {
-        Alert.alert("Erro", "Não foi possível carregar os dados.");
+        Alert.alert("Erro", "Não foi possível carregar os dados do perfil.");
+        console.error("Erro ao carregar dados:", error);
       } finally {
         setLoading(false);
       }
     };
     carregarDados();
   }, []);
-
-  // Função para salvar dados no AsyncStorage
-  const salvarAlteracoes = async () => {
-    if (!nome || !email || !senha) {
-      Alert.alert("Atenção", "Por favor, preencha todos os campos.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await AsyncStorage.setItem("nome", nome);
-      await AsyncStorage.setItem("email", email);
-      await AsyncStorage.setItem("senha", senha);
-
-      Alert.alert("Sucesso", "Dados atualizados com sucesso!");
-    } catch (error) {
-      Alert.alert("Erro", "Não foi possível salvar os dados.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const sairSessao = async () => {
     try {
@@ -65,13 +43,20 @@ export default function Perfil({ navigation }) {
       navigation.replace("Login");
     } catch (error) {
       Alert.alert("Erro", "Não foi possível sair da sessão.");
+      console.error("Erro ao sair:", error);
     }
+  };
+
+  const goToEditarReserva = () => {
+    // Por enquanto, vamos navegar para a tela de edição sem dados específicos.
+    // Em uma aplicação real, você precisaria selecionar uma reserva primeiro.
+    navigation.navigate("EditarReserva", { reserva: { id: null, sala: '', data: '', horario: '' } });
   };
 
   if (loading) {
     return (
       <View style={[styles.container, { justifyContent: "center" }]}>
-        <ActivityIndicator size="large" color="#D32F2F" />
+        <ActivityIndicator size="large" color="#730C0C" />
       </View>
     );
   }
@@ -79,34 +64,16 @@ export default function Perfil({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Nome:</Text>
-      <TextInput
-        style={styles.input}
-        value={nome}
-        onChangeText={setNome}
-        placeholder="Digite seu nome"
-      />
+      <Text style={styles.value}>{nome || "Não carregado"}</Text>
 
       <Text style={styles.label}>Email:</Text>
-      <TextInput
-        style={styles.input}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Digite seu email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
+      <Text style={styles.value}>{email || "Não carregado"}</Text>
 
-      <Text style={styles.label}>Senha:</Text>
-      <TextInput
-        style={styles.input}
-        value={senha}
-        onChangeText={setSenha}
-        placeholder="Digite sua senha"
-        secureTextEntry
-      />
+      <Text style={styles.label}>CPF:</Text>
+      <Text style={styles.value}>{cpf || "Não carregado"}</Text>
 
-      <TouchableOpacity style={styles.saveButton} onPress={salvarAlteracoes}>
-        <Text style={styles.saveButtonText}>Salvar Alterações</Text>
+      <TouchableOpacity style={styles.editReservasButton} onPress={goToEditarReserva}>
+        <Text style={styles.editReservasButtonText}>Minhas Reservas</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.logoutButton} onPress={sairSessao}>
@@ -119,43 +86,47 @@ export default function Perfil({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: "#FFEBEE",
+    backgroundColor: "#FFDCDC",
     flex: 1,
+    color: "#FFDCDC"
   },
   label: {
     fontWeight: "bold",
     marginTop: 15,
-    color: "#B71C1C",
+    color: "#730C0C",
   },
-  input: {
+  value: {
     borderWidth: 1,
-    borderColor: "#D32F2F",
+    borderColor: "#",
     borderRadius: 5,
     padding: 10,
     marginTop: 5,
-    backgroundColor: "white",
-  },
-  saveButton: {
-    backgroundColor: "#D32F2F",
-    marginTop: 40,
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  saveButtonText: {
-    color: "white",
-    fontWeight: "bold",
+    backgroundColor: "#FD7C7C",
     fontSize: 16,
+    color: "#F5F5F5",
+    marginBottom: 15,
   },
   logoutButton: {
-    backgroundColor: "#B71C1C",
+    backgroundColor: "#FA0505",
     marginTop: 20,
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
   },
   logoutButtonText: {
-    color: "white",
+    color: "FD7C7C",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  editReservasButton: {
+    backgroundColor: "#11CB0A",
+    marginTop: 30,
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  editReservasButtonText: {
+    color: "FD7C7C",
     fontWeight: "bold",
     fontSize: 16,
   },
