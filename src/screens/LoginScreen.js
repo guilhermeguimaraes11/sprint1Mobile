@@ -25,7 +25,7 @@ export default function Login({ navigation }) {
     (response) => {
       console.log(response.data.message);
       Alert.alert("OK", response.data.message);
-      console.log("PT", response.data.token);
+      console.log("OK", response.data.token); 
       AsyncStorage.setItem("idUsuario", response.data.user.id_usuario.toString());
       AsyncStorage.setItem("authorization", response.data.token);
       // Salvar nome, email e CPF aqui:
