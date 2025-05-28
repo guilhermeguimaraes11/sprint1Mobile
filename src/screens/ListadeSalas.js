@@ -9,9 +9,11 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons"; // Importa o ícone
+import { MaterialIcons } from "@expo/vector-icons";
 import api from "../axios/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export default function ListaDeSalas({ navigation }) {
   const [salas, setSalas] = useState([]);
@@ -21,6 +23,9 @@ export default function ListaDeSalas({ navigation }) {
   const [startTime, setStartTime] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
   const [searchText, setSearchText] = useState("");
+
+  const [isStartTimePickerVisible, setStartTimePickerVisible] = useState(false);
+  const [isEndTimePickerVisible, setEndTimePickerVisible] = useState(false);
 
   const verificarDisponibilidade = async (sala) => {
     try {
@@ -54,6 +59,10 @@ export default function ListaDeSalas({ navigation }) {
   const openModal = (item) => {
     setSelectedSala(item);
     setModalVisible(true);
+    // Reseta os horários ao abrir modal
+    setSelectedDate(new Date());
+    setStartTime(new Date());
+    setEndTime(new Date());
   };
 
   const closeModal = () => {
@@ -100,9 +109,35 @@ export default function ListaDeSalas({ navigation }) {
     </View>
   );
 
+  // Funções para controlar o picker de horário
+  const showStartTimePicker = () => setStartTimePickerVisible(true);
+  const hideStartTimePicker = () => setStartTimePickerVisible(false);
+
+  const showEndTimePicker = () => setEndTimePickerVisible(true);
+  const hideEndTimePicker = () => setEndTimePickerVisible(false);
+
+  const handleConfirmStartTime = (date) => {
+    setStartTime(date);
+    hideStartTimePicker();
+  };
+
+  const handleConfirmEndTime = (date) => {
+    setEndTime(date);
+    hideEndTimePicker();
+  };
+
+  // Função para formatar a data em YYYY-MM-DD para enviar na reserva
+  const formatDate = (date) => {
+    return date.toISOString().split("T")[0];
+  };
+
+  // Função para formatar o horário em HH:mm
+  const formatTime = (date) => {
+    return date.toTimeString().slice(0, 5);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header personalizado com botão de perfil e logout */}
       <View style={styles.customHeader}>
         <Text style={styles.headerTitle}>Lista de Salas</Text>
 
@@ -121,7 +156,6 @@ export default function ListaDeSalas({ navigation }) {
         </View>
       </View>
 
-      {/* Títulos da tabela */}
       <View style={styles.headerRow}>
         <Text style={styles.headerText}>NOME</Text>
         <Text style={styles.headerText}>DESCRIÇÃO</Text>
@@ -150,7 +184,6 @@ export default function ListaDeSalas({ navigation }) {
         </Text>
       </View>
 
-      {/* Modal de Reserva */}
       {selectedSala && (
         <Modal
           transparent={true}
@@ -174,25 +207,31 @@ export default function ListaDeSalas({ navigation }) {
               <Text style={styles.label}>Data da Reserva (YYYY-MM-DD):</Text>
               <TextInput
                 style={styles.searchInput}
-                placeholder="Ex:2025-05-06"
-                value={selectedDate}
-                onChangeText={(text) => setSelectedDate(text)}
+                placeholder="Ex: 2025-05-06"
+                value={formatDate(selectedDate)}
+                onChangeText={(text) => setSelectedDate(new Date(text))}
               />
 
-              <Text style={styles.label}>Horário de Início (HH:MM):</Text>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Ex: 08:00"
-                value={startTime}
-                onChangeText={(text) => setStartTime(text)}
+              <Text style={styles.label}>Horário de Início:</Text>
+              <TouchableOpacity onPress={showStartTimePicker} style={styles.searchInput}>
+                <Text>{formatTime(startTime)}</Text>
+              </TouchableOpacity>
+              <DateTimePickerModal
+                isVisible={isStartTimePickerVisible}
+                mode="time"
+                onConfirm={handleConfirmStartTime}
+                onCancel={hideStartTimePicker}
               />
 
-              <Text style={styles.label}>Horário de Fim (HH:MM):</Text>
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Ex: 10:00"
-                value={endTime}
-                onChangeText={(text) => setEndTime(text)}
+              <Text style={styles.label}>Horário de Fim:</Text>
+              <TouchableOpacity onPress={showEndTimePicker} style={styles.searchInput}>
+                <Text>{formatTime(endTime)}</Text>
+              </TouchableOpacity>
+              <DateTimePickerModal
+                isVisible={isEndTimePickerVisible}
+                mode="time"
+                onConfirm={handleConfirmEndTime}
+                onCancel={hideEndTimePicker}
               />
 
               <TouchableOpacity
@@ -206,9 +245,9 @@ export default function ListaDeSalas({ navigation }) {
                     }
 
                     const reserva = {
-                      data: selectedDate,
-                      horario_inicio: startTime,
-                      horario_fim: endTime,
+                      data: formatDate(selectedDate),
+                      horario_inicio: formatTime(startTime),
+                      horario_fim: formatTime(endTime),
                       fk_id_sala: selectedSala.id_sala,
                       fk_id_usuario: parseInt(idUsuario),
                     };
@@ -330,6 +369,8 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 10,
     borderRadius: 5,
+    width: '100%',
+    alignItems: 'center',
   },
   reserveButtonText: {
     color: "white",
@@ -354,5 +395,6 @@ const styles = StyleSheet.create({
     margin: 10,
     borderWidth: 0.5,
     borderColor: "#C0C0C0",
+    minWidth: 120,
   },
 });
