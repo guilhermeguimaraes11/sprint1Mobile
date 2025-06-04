@@ -1,10 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  View, Text, FlatList, StyleSheet, ActivityIndicator,
-  Button, Alert, Modal, TextInput, TouchableOpacity
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import sheets from '../axios/axios';
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  Button,
+  Alert,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import sheets from "../axios/axios";
+
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const TelaDeReservasDoUsuario = () => {
   const [reservas, setReservas] = useState([]);
@@ -14,8 +24,14 @@ const TelaDeReservasDoUsuario = () => {
   // Modal states
   const [modalVisible, setModalVisible] = useState(false);
   const [reservaSelecionada, setReservaSelecionada] = useState(null);
-  const [horarioInicio, setHorarioInicio] = useState('');
-  const [horarioFim, setHorarioFim] = useState('');
+  const [horarioInicio, setHorarioInicio] = useState("");
+  const [horarioFim, setHorarioFim] = useState("");
+
+  const [isStartTimePickerVisible, setStartTimePickerVisible] = useState(false);
+  const [isEndTimePickerVisible, setEndTimePickerVisible] = useState(false);
+
+  // Para formatar a data da reserva
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
 
   useEffect(() => {
     carregarDados();
@@ -24,7 +40,7 @@ const TelaDeReservasDoUsuario = () => {
   const carregarDados = async () => {
     setLoading(true);
     try {
-      const id = await AsyncStorage.getItem('idUsuario');
+      const id = await AsyncStorage.getItem("idUsuario");
       setUserId(id);
 
       if (id) {
@@ -33,15 +49,18 @@ const TelaDeReservasDoUsuario = () => {
 
         if (dados && Array.isArray(dados.reserva_sala)) {
           const reservasDoUsuario = dados.reserva_sala.filter(
-            reserva => reserva.fk_id_usuario.toString() === id.toString()
+            (reserva) => reserva.fk_id_usuario.toString() === id.toString()
           );
           setReservas(reservasDoUsuario);
         } else {
-          console.warn('O array reserva_sala não foi encontrado no response:', dados);
+          console.warn(
+            "O array reserva_sala não foi encontrado no response:",
+            dados
+          );
         }
       }
     } catch (error) {
-      console.error('Erro ao carregar reservas:', error);
+      console.error("Erro ao carregar reservas:", error);
     } finally {
       setLoading(false);
     }
@@ -58,7 +77,7 @@ const TelaDeReservasDoUsuario = () => {
   // Atualizar reserva com os dados do modal
   const salvarEdicao = async () => {
     if (!horarioInicio || !horarioFim) {
-      Alert.alert('Erro', 'Preencha todos os campos de horário.');
+      Alert.alert("Erro", "Preencha todos os campos de horário.");
       return;
     }
 
@@ -68,13 +87,16 @@ const TelaDeReservasDoUsuario = () => {
         horario_inicio: horarioInicio,
         horario_fim: horarioFim,
       };
-      await sheets.updateReserva(reservaSelecionada.id_reserva, dadosAtualizados);
-      Alert.alert('Sucesso', 'Reserva atualizada!');
+      await sheets.updateReserva(
+        reservaSelecionada.id_reserva,
+        dadosAtualizados
+      );
+      Alert.alert("Sucesso", "Reserva atualizada!");
       setModalVisible(false);
       carregarDados();
     } catch (error) {
       console.error(error.response?.data || error.message);
-      Alert.alert('Erro', 'Não foi possível atualizar a reserva.');
+      Alert.alert("Erro", "Não foi possível atualizar a reserva.");
     }
   };
 
@@ -82,19 +104,48 @@ const TelaDeReservasDoUsuario = () => {
   const deletarReserva = async (idReserva) => {
     try {
       await sheets.deleteReserva(idReserva);
-      Alert.alert('Sucesso', 'Reserva deletada com sucesso!');
+      Alert.alert("Sucesso", "Reserva deletada com sucesso!");
       carregarDados();
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível deletar a reserva.');
+      Alert.alert("Erro", "Não foi possível deletar a reserva.");
       console.error(error);
     }
+  };
+
+  // Funções para controlar o picker de horário
+  const showStartTimePicker = () => setStartTimePickerVisible(true);
+  const hideStartTimePicker = () => setStartTimePickerVisible(false);
+
+  const showEndTimePicker = () => setEndTimePickerVisible(true);
+  const hideEndTimePicker = () => setEndTimePickerVisible(false);
+
+  const handleConfirmStartTime = (date) => {
+    setHorarioInicio(formatTime(date)); // <-- aqui está o erro principal
+    hideStartTimePicker();
+  };
+
+  const handleConfirmEndTime = (date) => {
+    setHorarioFim(formatTime(date));
+    hideEndTimePicker();
+  };
+
+  // Função para formatar a data em YYYY-MM-DD para enviar na reserva
+  const formatDate = (date) => {
+    return date.toISOString().split("T")[0];
+  };
+
+  // Função para formatar o horário em HH:mm
+  const formatTime = (date) => {
+    return date.toTimeString().slice(0, 5);
   };
 
   const renderItem = ({ item }) => (
     <View style={styles.reservaItem}>
       <Text>Sala: {item.fk_id_sala}</Text>
       <Text>Data: {new Date(item.data).toLocaleDateString()}</Text>
-      <Text>Horário: {item.horario_inicio} - {item.horario_fim}</Text>
+      <Text>
+        Horário: {item.horario_inicio} - {item.horario_fim}
+      </Text>
       <View style={styles.botoesContainer}>
         <Button
           title="Editar"
@@ -105,11 +156,15 @@ const TelaDeReservasDoUsuario = () => {
           title="Excluir"
           onPress={() =>
             Alert.alert(
-              'Confirmar exclusão',
-              'Tem certeza que deseja deletar esta reserva?',
+              "Confirmar exclusão",
+              "Tem certeza que deseja deletar esta reserva?",
               [
-                { text: 'Cancelar', style: 'cancel' },
-                { text: 'Excluir', style: 'destructive', onPress: () => deletarReserva(item.id_reserva) },
+                { text: "Cancelar", style: "cancel" },
+                {
+                  text: "Excluir",
+                  style: "destructive",
+                  onPress: () => deletarReserva(item.id_reserva),
+                },
               ]
             )
           }
@@ -121,7 +176,12 @@ const TelaDeReservasDoUsuario = () => {
 
   if (loading) {
     return (
-      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         <ActivityIndicator size="large" color="#D32F2F" />
       </View>
     );
@@ -134,7 +194,7 @@ const TelaDeReservasDoUsuario = () => {
         <FlatList
           data={reservas}
           renderItem={renderItem}
-          keyExtractor={item => item.id_reserva.toString()}
+          keyExtractor={(item) => item.id_reserva.toString()}
         />
       ) : (
         <Text>Você não tem nenhuma reserva.</Text>
@@ -151,38 +211,46 @@ const TelaDeReservasDoUsuario = () => {
           <View style={styles.modalContainer}>
             <Text style={styles.modalTitle}>Editar Reserva</Text>
 
-            <Text>Horário Início</Text>
-            <TextInput
+            <Text style={{ marginBottom: 5 }}>Horário Início</Text>
+            <TouchableOpacity
               style={styles.input}
-              value={horarioInicio}
-              onChangeText={setHorarioInicio}
-              placeholder="HH:MM:SS"
+              onPress={showStartTimePicker}
+            >
+              <Text>{horarioInicio || "Selecionar horário de início"}</Text>
+            </TouchableOpacity>
+
+            <Text style={{ marginTop: 15, marginBottom: 5 }}>Horário Fim</Text>
+            <TouchableOpacity style={styles.input} onPress={showEndTimePicker}>
+              <Text>{horarioFim || "Selecionar horário de fim"}</Text>
+            </TouchableOpacity>
+            <DateTimePickerModal
+              isVisible={isStartTimePickerVisible}
+              mode="time"
+              onConfirm={handleConfirmStartTime}
+              onCancel={hideStartTimePicker}
             />
 
-            <Text>Horário Fim</Text>
-            <TextInput
-              style={styles.input}
-              value={horarioFim}
-              onChangeText={setHorarioFim}
-              placeholder="HH:MM:SS"
+            <DateTimePickerModal
+              isVisible={isEndTimePickerVisible}
+              mode="time"
+              onConfirm={handleConfirmEndTime}
+              onCancel={hideEndTimePicker}
             />
 
             <View style={styles.modalButtons}>
               <TouchableOpacity
-                style={[styles.button, { backgroundColor: '#1976D2' }]}
+                style={[styles.button, { backgroundColor: "#1976D2" }]}
                 onPress={salvarEdicao}
               >
                 <Text style={styles.buttonText}>Salvar</Text>
               </TouchableOpacity>
-
               <TouchableOpacity
-                style={[styles.button, { backgroundColor: '#D32F2F' }]}
+                style={[styles.button, { backgroundColor: "#D32F2F" }]}
                 onPress={() => setModalVisible(false)}
               >
                 <Text style={styles.buttonText}>Cancelar</Text>
               </TouchableOpacity>
             </View>
-
           </View>
         </View>
       </Modal>
@@ -194,31 +262,31 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: '#FFDCDC',
+    backgroundColor: "#FFDCDC",
   },
   header: {
     fontSize: 22,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
-    color: '#333',
+    color: "#333",
   },
   reservaItem: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     padding: 15,
     marginBottom: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
   },
   botoesContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: 10,
   },
   modalBackground: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContainer: {
     marginHorizontal: 20,
@@ -229,7 +297,7 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 15,
   },
   input: {

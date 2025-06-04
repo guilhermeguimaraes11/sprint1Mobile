@@ -12,10 +12,13 @@ export default function Header({ title, onLogout }) {
 
   return (
     <View style={styles.header}>
-      {/* Botão de perfil */}
-      <TouchableOpacity onPress={goToProfile} style={styles.profileButton}>
-        <Ionicons name="person-circle-outline" size={28} color="white" />
-      </TouchableOpacity>
+      {onLogout ? (
+        <TouchableOpacity onPress={goToProfile} style={styles.profileButton}>
+          <Ionicons name="person-circle-outline" size={28} color="white" />
+        </TouchableOpacity>
+      ) : (
+        <View style={{ width: 36 }} />
+      )}
 
       <Text style={styles.headerTitle}>{title}</Text>
 
@@ -57,4 +60,3 @@ const styles = StyleSheet.create({
     padding: 4,
   },
 });
-  

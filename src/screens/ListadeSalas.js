@@ -30,28 +30,38 @@ export default function ListaDeSalas({ navigation }) {
   // Para formatar a data da reserva
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
 
-  const verificarDisponibilidade = async (sala) => {
-    try {
-      // Formatar a data de hoje (YYYY-MM-DD)
-      const hoje = new Date().toISOString().split("T")[0];
-      console.log(sala);
-      // Chama a API para verificar a disponibilidade da sala na data
-      const response = await api.getSalasDisponiveisPorData(sala.id_sala, hoje,hoje);
+  const [disponibilidadeModalVisible, setDisponibilidadeModalVisible] = useState(false);
+const [disponibilidadeMensagem, setDisponibilidadeMensagem] = useState("");
 
-      // Exibe a mensagem de disponibilidade
-      const disponibilidade = response.data.disponivel
-        ? "Disponível"
-        : "Indisponível";
-      setDisponibilidadeMensagem(
-        `Disponibilidade em ${hoje}: ${disponibilidade}`
-      );
-    } catch (error) {
-      console.error("Erro ao verificar disponibilidade", error);
-      alert(
-        error.response?.data?.error || "Erro ao verificar disponibilidade."
-      );
-    }
-  };
+
+const verificarDisponibilidade = async (sala) => {
+  try {
+    const dataInicio = new Date(selectedDate);
+    dataInicio.setHours(startTime.getHours(), startTime.getMinutes(), 0);
+
+    const dataFim = new Date(selectedDate);
+    dataFim.setHours(endTime.getHours(), endTime.getMinutes(), 0);
+
+    const data_inicio_str = dataInicio.toISOString();
+    const data_fim_str = dataFim.toISOString();
+
+    const response = await api.get(
+      `/salasdisponiveldata/${sala.id_sala}/${data_inicio_str}/${data_fim_str}`
+    );
+
+    const disponibilidade =
+      response.data.length === 0 ? "Indisponível" : "Disponível";
+
+    setDisponibilidadeMensagem(`Sala "${sala.nome}" entre ${formatTime(startTime)} e ${formatTime(endTime)}: ${disponibilidade}`);
+  } catch (error) {
+    console.error("Erro ao verificar disponibilidade", error);
+    setDisponibilidadeMensagem("Erro ao verificar disponibilidade.");
+  } finally {
+    setDisponibilidadeModalVisible(true);
+  }
+};
+
+
 
   async function getSalas() {
     try {
@@ -308,6 +318,31 @@ export default function ListaDeSalas({ navigation }) {
           </TouchableOpacity>
         </Modal>
       )}
+
+      <Modal
+  transparent={true}
+  animationType="fade"
+  visible={disponibilidadeModalVisible}
+  onRequestClose={() => setDisponibilidadeModalVisible(false)}
+>
+  <TouchableOpacity
+    style={styles.modalOverlay}
+    activeOpacity={1}
+    onPressOut={() => setDisponibilidadeModalVisible(false)}
+  >
+    <View style={styles.modalContent}>
+      <Text style={styles.modalTitle}>Disponibilidade da Sala</Text>
+      <Text>{disponibilidadeMensagem}</Text>
+      <TouchableOpacity
+        style={styles.reserveButton}
+        onPress={() => setDisponibilidadeModalVisible(false)}
+      >
+        <Text style={styles.reserveButtonText}>Fechar</Text>
+      </TouchableOpacity>
+    </View>
+  </TouchableOpacity>
+</Modal>
+
     </SafeAreaView>
   );
 }
