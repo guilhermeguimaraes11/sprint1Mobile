@@ -8,10 +8,12 @@ import {
   Modal,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import api from "../axios/axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import DisponibilidadeModal from "../components/DisponibilidadeModal"; // ajuste o caminho se necessário
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
@@ -20,48 +22,50 @@ export default function ListaDeSalas({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSala, setSelectedSala] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [startTime, setStartTime] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date());
-  const [searchText, setSearchText] = useState("");
+  const [modalDisponibilidadeVisible, setModalDisponibilidadeVisible] =
+    useState(false);
+  const [salaSelecionadaParaConsulta, setSalaSelecionadaParaConsulta] =
+    useState(null);
+  const [disponibilidadeMensagem, setDisponibilidadeMensagem] = useState("");
 
+  const [searchText, setSearchText] = useState("");
   const [isStartTimePickerVisible, setStartTimePickerVisible] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisible] = useState(false);
 
   // Para formatar a data da reserva
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [disponibilidadeModalVisible, setDisponibilidadeModalVisible] =
+    useState(false);
 
-  const [disponibilidadeModalVisible, setDisponibilidadeModalVisible] = useState(false);
-const [disponibilidadeMensagem, setDisponibilidadeMensagem] = useState("");
+  const abrirModalDisponibilidade = () => {
+    setModalDisponibilidadeVisible(true);
+  };
 
+  const confirmarDisponibilidade = async (dataInicio, dataFim) => {
+    setModalDisponibilidadeVisible(false);
 
-const verificarDisponibilidade = async (sala) => {
-  try {
-    const dataInicio = new Date(selectedDate);
-    dataInicio.setHours(startTime.getHours(), startTime.getMinutes(), 0);
+    const formatDateTime = (date) => {
+      return new Date(date).toISOString().slice(0, 19).replace('T', ' ');
+    };
+    
+    const dataInicioFormatada = formatDateTime(dataInicio);
+    const dataFimFormatada = formatDateTime(dataFim);
+    
 
-    const dataFim = new Date(selectedDate);
-    dataFim.setHours(endTime.getHours(), endTime.getMinutes(), 0);
+    try {
+      const response = await api.getDisponibilidade(
+        dataInicioFormatada,
+        dataFimFormatada
+      );
+      Alert.alert(response.data.message)
+      setSalas(response.data.salasDisponiveisFinal)
+    } catch (error) {
+      setDisponibilidadeMensagem("Erro ao consultar disponibilidade.");
+      Alert.alert(error.response.data.error)
+    } 
+  };
 
-    const data_inicio_str = dataInicio.toISOString();
-    const data_fim_str = dataFim.toISOString();
-
-    const response = await api.get(
-      `/salasdisponiveldata/${sala.id_sala}/${data_inicio_str}/${data_fim_str}`
-    );
-
-    const disponibilidade =
-      response.data.length === 0 ? "Indisponível" : "Disponível";
-
-    setDisponibilidadeMensagem(`Sala "${sala.nome}" entre ${formatTime(startTime)} e ${formatTime(endTime)}: ${disponibilidade}`);
-  } catch (error) {
-    console.error("Erro ao verificar disponibilidade", error);
-    setDisponibilidadeMensagem("Erro ao verificar disponibilidade.");
-  } finally {
-    setDisponibilidadeModalVisible(true);
-  }
-};
-
-
+  
 
   async function getSalas() {
     try {
@@ -75,16 +79,14 @@ const verificarDisponibilidade = async (sala) => {
 
   useEffect(() => {
     getSalas();
-    console.log("ID da sala: ", salas)
+    console.log("ID da sala: ", salas);
   }, []);
 
   const openModal = (item) => {
     setSelectedSala(item);
     setModalVisible(true);
-    // Reseta os horários ao abrir modal
+    // Reseta os DIAS ao abrir modal
     setSelectedDate(new Date());
-    setStartTime(new Date());
-    setEndTime(new Date());
   };
 
   const closeModal = () => {
@@ -121,15 +123,7 @@ const verificarDisponibilidade = async (sala) => {
           <Text style={styles.actionButtonText}>Reservar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => verificarDisponibilidade(item)}
-          style={[
-            styles.actionButton,
-            { marginTop: 5, backgroundColor: "#9C27B0" },
-          ]}
-        >
-          <Text style={styles.actionButtonText}>Disponibilidade</Text>
-        </TouchableOpacity>
+        
       </View>
     </View>
   );
@@ -199,11 +193,25 @@ const verificarDisponibilidade = async (sala) => {
         value={searchText}
         onChangeText={(text) => setSearchText(text)}
       />
+      <TouchableOpacity
+          onPress={() => abrirModalDisponibilidade()}
+          style={[
+            styles.actionButton,
+            { marginTop: 5, backgroundColor: "#9C27B0" },
+          ]}
+        >
+          <Text style={styles.actionButtonText}>Disponibilidade</Text>
+        </TouchableOpacity>
 
       <FlatList
         data={filteredSalas}
         renderItem={renderItem}
         keyExtractor={(item) => item.id_sala.toString()}
+      />
+      <DisponibilidadeModal
+        visible={modalDisponibilidadeVisible}
+        onClose={() => setModalDisponibilidadeVisible(false)}
+        onConfirm={confirmarDisponibilidade}
       />
 
       <View style={styles.footer}>
@@ -320,29 +328,28 @@ const verificarDisponibilidade = async (sala) => {
       )}
 
       <Modal
-  transparent={true}
-  animationType="fade"
-  visible={disponibilidadeModalVisible}
-  onRequestClose={() => setDisponibilidadeModalVisible(false)}
->
-  <TouchableOpacity
-    style={styles.modalOverlay}
-    activeOpacity={1}
-    onPressOut={() => setDisponibilidadeModalVisible(false)}
-  >
-    <View style={styles.modalContent}>
-      <Text style={styles.modalTitle}>Disponibilidade da Sala</Text>
-      <Text>{disponibilidadeMensagem}</Text>
-      <TouchableOpacity
-        style={styles.reserveButton}
-        onPress={() => setDisponibilidadeModalVisible(false)}
+        transparent={true}
+        animationType="fade"
+        visible={disponibilidadeModalVisible}
+        onRequestClose={() => setDisponibilidadeModalVisible(false)}
       >
-        <Text style={styles.reserveButtonText}>Fechar</Text>
-      </TouchableOpacity>
-    </View>
-  </TouchableOpacity>
-</Modal>
-
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPressOut={() => setDisponibilidadeModalVisible(false)}
+        >
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Disponibilidade da Sala</Text>
+            <Text>{disponibilidadeMensagem}</Text>
+            <TouchableOpacity
+              style={styles.reserveButton}
+              onPress={() => setDisponibilidadeModalVisible(false)}
+            >
+              <Text style={styles.reserveButtonText}>Fechar</Text>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
