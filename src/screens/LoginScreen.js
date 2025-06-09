@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import api from "../axios/axios";
 import { Ionicons } from "@expo/vector-icons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import Header from "../components/Header"; // Importa o Header
 
 export default function Login({ navigation }) {
@@ -20,26 +20,29 @@ export default function Login({ navigation }) {
     showPassword: false,
   });
 
- async function handleLogin() {
-  await api.postLogin(usuario).then(
-    (response) => {
-      console.log(response.data.message);
-      Alert.alert("OK", response.data.message);
-      console.log("OK", response.data.token); 
-      AsyncStorage.setItem("idUsuario", response.data.user.id_usuario.toString());
-      AsyncStorage.setItem("authorization", response.data.token);
-      // Salvar nome, email e CPF aqui:
-      AsyncStorage.setItem("nome", response.data.user.nomecompleto);
-      AsyncStorage.setItem("email", response.data.user.email);
-      AsyncStorage.setItem("cpf", response.data.user.cpf);
+  async function handleLogin() {
+    try {
+      const response = await api.postLogin(usuario);
+      const { message, token, user } = response.data;
+
+      console.log(message);
+      Alert.alert("OK", message);
+      console.log("Token:", token);
+
+      // Armazena dados com SecureStore
+      await SecureStore.setItemAsync("idUsuario", user.id_usuario.toString());
+      await SecureStore.setItemAsync("token", token);
+      await SecureStore.setItemAsync("nome", user.nomecompleto);
+      await SecureStore.setItemAsync("email", user.email);
+      await SecureStore.setItemAsync("cpf", user.cpf);
+
       navigation.navigate("ListaDeSalas");
-    },
-    (error) => {
-      Alert.alert("Erro", error.response.data.error);
-      console.log(error);
+    } catch (error) {
+      const msg = error.response?.data?.error || "Erro ao fazer login.";
+      Alert.alert("Erro", msg);
+      console.error("Erro de login:", error);
     }
-  );
-}
+  }
 
   return (
     <View style={styles.container}>
@@ -88,7 +91,9 @@ export default function Login({ navigation }) {
           onPress={() => navigation.navigate("Cadastro")}
           style={styles.buttoncadastrese}
         >
-          <Text style={styles.butoomCadastre}>Não tem uma conta? Cadastre-se</Text>
+          <Text style={styles.butoomCadastre}>
+            Não tem uma conta? Cadastre-se
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -161,12 +166,11 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: 13,
     textAlign: "center",
-    width:"100%",
+    width: "100%",
     padding: 23,
     backgroundColor: "#D32F2F",
     alignItems: "center",
   },
-
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",

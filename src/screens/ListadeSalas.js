@@ -12,9 +12,8 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import api from "../axios/axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import DisponibilidadeModal from "../components/DisponibilidadeModal"; // ajuste o caminho se necessário
-
+import * as SecureStore from "expo-secure-store";
+import DisponibilidadeModal from "../components/DisponibilidadeModal";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 export default function ListaDeSalas({ navigation }) {
@@ -22,50 +21,33 @@ export default function ListaDeSalas({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSala, setSelectedSala] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [modalDisponibilidadeVisible, setModalDisponibilidadeVisible] =
-    useState(false);
-  const [salaSelecionadaParaConsulta, setSalaSelecionadaParaConsulta] =
-    useState(null);
-  const [disponibilidadeMensagem, setDisponibilidadeMensagem] = useState("");
+  const [startTime, setStartTime] = useState(new Date());
+  const [endTime, setEndTime] = useState(new Date());
 
+  const [modalDisponibilidadeVisible, setModalDisponibilidadeVisible] = useState(false);
+  const [disponibilidadeMensagem, setDisponibilidadeMensagem] = useState("");
   const [searchText, setSearchText] = useState("");
   const [isStartTimePickerVisible, setStartTimePickerVisible] = useState(false);
   const [isEndTimePickerVisible, setEndTimePickerVisible] = useState(false);
-
-  // Para formatar a data da reserva
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
-  const [disponibilidadeModalVisible, setDisponibilidadeModalVisible] =
-    useState(false);
 
-  const abrirModalDisponibilidade = () => {
-    setModalDisponibilidadeVisible(true);
-  };
+  const abrirModalDisponibilidade = () => setModalDisponibilidadeVisible(true);
 
   const confirmarDisponibilidade = async (dataInicio, dataFim) => {
     setModalDisponibilidadeVisible(false);
-
-    const formatDateTime = (date) => {
-      return new Date(date).toISOString().slice(0, 19).replace('T', ' ');
-    };
-    
+    const formatDateTime = (date) => new Date(date).toISOString().slice(0, 19).replace("T", " ");
     const dataInicioFormatada = formatDateTime(dataInicio);
     const dataFimFormatada = formatDateTime(dataFim);
-    
 
     try {
-      const response = await api.getDisponibilidade(
-        dataInicioFormatada,
-        dataFimFormatada
-      );
-      Alert.alert(response.data.message)
-      setSalas(response.data.salasDisponiveisFinal)
+      const response = await api.getDisponibilidade(dataInicioFormatada, dataFimFormatada);
+      Alert.alert(response.data.message);
+      setSalas(response.data.salasDisponiveisFinal);
     } catch (error) {
       setDisponibilidadeMensagem("Erro ao consultar disponibilidade.");
-      Alert.alert(error.response.data.error)
-    } 
+      Alert.alert(error.response?.data?.error || "Erro ao consultar.");
+    }
   };
-
-  
 
   async function getSalas() {
     try {
@@ -79,13 +61,11 @@ export default function ListaDeSalas({ navigation }) {
 
   useEffect(() => {
     getSalas();
-    console.log("ID da sala: ", salas);
   }, []);
 
   const openModal = (item) => {
     setSelectedSala(item);
     setModalVisible(true);
-    // Reseta os DIAS ao abrir modal
     setSelectedDate(new Date());
   };
 
@@ -96,7 +76,7 @@ export default function ListaDeSalas({ navigation }) {
 
   const handleLogout = async () => {
     try {
-      await AsyncStorage.removeItem("idUsuario");
+      await SecureStore.deleteItemAsync("idUsuario");
       alert("Você foi desconectado.");
       navigation.navigate("Login");
     } catch (error) {
@@ -116,22 +96,15 @@ export default function ListaDeSalas({ navigation }) {
       <Text style={styles.cell}>{item.tipo}</Text>
       <Text style={styles.cell}>{item.capacidade}</Text>
       <View style={styles.cell}>
-        <TouchableOpacity
-          onPress={() => openModal(item)}
-          style={styles.actionButton}
-        >
+        <TouchableOpacity onPress={() => openModal(item)} style={styles.actionButton}>
           <Text style={styles.actionButtonText}>Reservar</Text>
         </TouchableOpacity>
-
-        
       </View>
     </View>
   );
 
-  // Funções para controlar o picker de horário
   const showStartTimePicker = () => setStartTimePickerVisible(true);
   const hideStartTimePicker = () => setStartTimePickerVisible(false);
-
   const showEndTimePicker = () => setEndTimePickerVisible(true);
   const hideEndTimePicker = () => setEndTimePickerVisible(false);
 
@@ -145,63 +118,38 @@ export default function ListaDeSalas({ navigation }) {
     hideEndTimePicker();
   };
 
-  // Função para formatar a data em YYYY-MM-DD para enviar na reserva
-  const formatDate = (date) => {
-    return date.toISOString().split("T")[0];
-  };
-
-  // Função para formatar o horário em HH:mm
-  const formatTime = (date) => {
-    return date.toTimeString().slice(0, 5);
-  };
+  const formatDate = (date) => date.toISOString().split("T")[0];
+  const formatTime = (date) => date.toTimeString().slice(0, 5);
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.customHeader}>
         <Text style={styles.headerTitle}>Lista de Salas</Text>
-
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <TouchableOpacity
-            style={{ marginRight: 15 }}
-            onPress={() => navigation.navigate("Perfil")}
-            accessibilityLabel="Ir para perfil"
-          >
+          <TouchableOpacity style={{ marginRight: 15 }} onPress={() => navigation.navigate("Perfil")}>
             <MaterialIcons name="account-circle" size={28} color="white" />
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.headerLogoutButton}
-            onPress={handleLogout}
-          >
+          <TouchableOpacity style={styles.headerLogoutButton} onPress={handleLogout}>
             <Text style={styles.headerLogoutText}>Logout</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.headerRow}>
-        <Text style={styles.headerText}>NOME</Text>
-        <Text style={styles.headerText}>DESCRIÇÃO</Text>
-        <Text style={styles.headerText}>BLOCO</Text>
-        <Text style={styles.headerText}>TIPO</Text>
-        <Text style={styles.headerText}>CAPACIDADE</Text>
-        <Text style={styles.headerText}>AÇÕES</Text>
+        {["NOME", "DESCRIÇÃO", "BLOCO", "TIPO", "CAPACIDADE", "AÇÕES"].map((col) => (
+          <Text key={col} style={styles.headerText}>{col}</Text>
+        ))}
       </View>
 
       <TextInput
         placeholder="Buscar sala"
         style={styles.searchInput}
         value={searchText}
-        onChangeText={(text) => setSearchText(text)}
+        onChangeText={setSearchText}
       />
-      <TouchableOpacity
-          onPress={() => abrirModalDisponibilidade()}
-          style={[
-            styles.actionButton,
-            { marginTop: 5, backgroundColor: "#9C27B0" },
-          ]}
-        >
-          <Text style={styles.actionButtonText}>Disponibilidade</Text>
-        </TouchableOpacity>
+      <TouchableOpacity onPress={abrirModalDisponibilidade} style={[styles.actionButton, { marginTop: 5, backgroundColor: "#9C27B0" }]}>
+        <Text style={styles.actionButtonText}>Disponibilidade</Text>
+      </TouchableOpacity>
 
       <FlatList
         data={filteredSalas}
@@ -221,17 +169,8 @@ export default function ListaDeSalas({ navigation }) {
       </View>
 
       {selectedSala && (
-        <Modal
-          transparent={true}
-          animationType="slide"
-          visible={modalVisible}
-          onRequestClose={closeModal}
-        >
-          <TouchableOpacity
-            style={styles.modalOverlay}
-            activeOpacity={1}
-            onPress={closeModal}
-          >
+        <Modal transparent animationType="slide" visible={modalVisible} onRequestClose={closeModal}>
+          <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={closeModal}>
             <TouchableOpacity activeOpacity={1} style={styles.modalContent}>
               <Text style={styles.modalTitle}>Reserva de Sala</Text>
               <Text>Nome: {selectedSala.nome}</Text>
@@ -241,11 +180,7 @@ export default function ListaDeSalas({ navigation }) {
               <Text>Capacidade: {selectedSala.capacidade}</Text>
 
               <Text style={styles.label}>Data da Reserva (YYYY-MM-DD):</Text>
-
-              <TouchableOpacity
-                onPress={() => setDatePickerVisible(true)}
-                style={styles.searchInput}
-              >
+              <TouchableOpacity onPress={() => setDatePickerVisible(true)} style={styles.searchInput}>
                 <Text>{formatDate(selectedDate)}</Text>
               </TouchableOpacity>
 
@@ -260,10 +195,7 @@ export default function ListaDeSalas({ navigation }) {
               />
 
               <Text style={styles.label}>Horário de Início:</Text>
-              <TouchableOpacity
-                onPress={showStartTimePicker}
-                style={styles.searchInput}
-              >
+              <TouchableOpacity onPress={showStartTimePicker} style={styles.searchInput}>
                 <Text>{formatTime(startTime)}</Text>
               </TouchableOpacity>
               <DateTimePickerModal
@@ -274,10 +206,7 @@ export default function ListaDeSalas({ navigation }) {
               />
 
               <Text style={styles.label}>Horário de Fim:</Text>
-              <TouchableOpacity
-                onPress={showEndTimePicker}
-                style={styles.searchInput}
-              >
+              <TouchableOpacity onPress={showEndTimePicker} style={styles.searchInput}>
                 <Text>{formatTime(endTime)}</Text>
               </TouchableOpacity>
               <DateTimePickerModal
@@ -291,11 +220,11 @@ export default function ListaDeSalas({ navigation }) {
                 style={styles.reserveButton}
                 onPress={async () => {
                   try {
-                    const idUsuario = await AsyncStorage.getItem("idUsuario");
-                    if (!idUsuario) {
-                      alert("Usuário não autenticado.");
-                      return;
-                    }
+                      const idUsuario = await SecureStore.getItemAsync("idUsuario");
+                      if (!idUsuario) {
+                        alert("Usuário não autenticado.");
+                        return;
+                      }
 
                     const reserva = {
                       data: formatDate(selectedDate),
@@ -309,47 +238,21 @@ export default function ListaDeSalas({ navigation }) {
                     alert(response.data.message);
                     closeModal();
                   } catch (error) {
-                    alert(error.response?.data?.error || "Erro inesperado");
+                    console.log("Erro na reserva:", error.response.data);
+                    alert(error.response.data);
                   }
                 }}
               >
                 <Text style={styles.reserveButtonText}>Confirmar Reserva</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.reserveButton}
-                onPress={closeModal}
-              >
+              <TouchableOpacity style={styles.reserveButton} onPress={closeModal}>
                 <Text style={styles.reserveButtonText}>Cancelar</Text>
               </TouchableOpacity>
             </TouchableOpacity>
           </TouchableOpacity>
         </Modal>
       )}
-
-      <Modal
-        transparent={true}
-        animationType="fade"
-        visible={disponibilidadeModalVisible}
-        onRequestClose={() => setDisponibilidadeModalVisible(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPressOut={() => setDisponibilidadeModalVisible(false)}
-        >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Disponibilidade da Sala</Text>
-            <Text>{disponibilidadeMensagem}</Text>
-            <TouchableOpacity
-              style={styles.reserveButton}
-              onPress={() => setDisponibilidadeModalVisible(false)}
-            >
-              <Text style={styles.reserveButtonText}>Fechar</Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableOpacity>
-      </Modal>
     </SafeAreaView>
   );
 }
