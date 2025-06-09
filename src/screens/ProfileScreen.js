@@ -6,22 +6,24 @@ import {
   Alert,
   TouchableOpacity,
   ActivityIndicator,
+  TextInput,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 
 export default function Perfil({ navigation }) {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const carregarDados = async () => {
       setLoading(true);
       try {
-        const nomeSalvo = await AsyncStorage.getItem("nome");
-        const emailSalvo = await AsyncStorage.getItem("email");
-        const cpfSalvo = await AsyncStorage.getItem("cpf");
+        const nomeSalvo = await SecureStore.getItemAsync("nome");
+        const emailSalvo = await SecureStore.getItemAsync("email");
+        const cpfSalvo = await SecureStore.getItemAsync("cpf");
 
         if (nomeSalvo) setNome(nomeSalvo);
         if (emailSalvo) setEmail(emailSalvo);
@@ -38,7 +40,11 @@ export default function Perfil({ navigation }) {
 
   const sairSessao = async () => {
     try {
-      await AsyncStorage.clear();
+      await SecureStore.deleteItemAsync("nome");
+      await SecureStore.deleteItemAsync("email");
+      await SecureStore.deleteItemAsync("cpf");
+      await SecureStore.deleteItemAsync("token");
+
       Alert.alert("Sessão encerrada", "Você saiu da sessão com sucesso!");
       navigation.replace("Login");
     } catch (error) {
@@ -48,9 +54,35 @@ export default function Perfil({ navigation }) {
   };
 
   const goToEditarReserva = () => {
-    // Por enquanto, vamos navegar para a tela de edição sem dados específicos.
-    // Em uma aplicação real, você precisaria selecionar uma reserva primeiro.
-    navigation.navigate("EditarReserva", { reserva: { id: null, sala: '', data: '', horario: '' } });
+    navigation.navigate("EditarReserva", {
+      reserva: { id: null, sala: "", data: "", horario: "" },
+    });
+  };
+
+  const salvarAlteracoes = async () => {
+    setSaving(true);
+
+    try {
+      // Aqui você pode implementar o fetch para a API que atualiza o usuário
+      // Exemplo:
+      // await fetch("API_URL/usuario/:id", {
+      //   method: "PUT",
+      //   headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      //   body: JSON.stringify({ nomecompleto: nome, email, cpf }),
+      // });
+
+      // Também salve localmente as alterações:
+      await SecureStore.setItemAsync("nome", nome);
+      await SecureStore.setItemAsync("email", email);
+      await SecureStore.setItemAsync("cpf", cpf);
+
+      Alert.alert("Sucesso", "Dados atualizados com sucesso!");
+    } catch (error) {
+      Alert.alert("Erro", "Não foi possível salvar as alterações.");
+      console.error("Erro ao salvar alterações:", error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (loading) {
@@ -64,15 +96,41 @@ export default function Perfil({ navigation }) {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Nome:</Text>
-      <Text style={styles.value}>{nome || "Não carregado"}</Text>
+      <TextInput
+        style={styles.input}
+        value={nome}
+        onChangeText={setNome}
+        placeholder="Digite seu nome"
+        autoCapitalize="words"
+      />
 
       <Text style={styles.label}>Email:</Text>
-      <Text style={styles.value}>{email || "Não carregado"}</Text>
+      <TextInput
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        placeholder="Digite seu email"
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
 
       <Text style={styles.label}>CPF:</Text>
-      <Text style={styles.value}>{cpf || "Não carregado"}</Text>
+      <TextInput
+        style={styles.input}
+        value={cpf}
+        onChangeText={setCpf}
+        placeholder="Digite seu CPF"
+        keyboardType="numeric"
+      />
 
-      <TouchableOpacity style={styles.editReservasButton} onPress={goToEditarReserva}>
+      <TouchableOpacity style={styles.saveButton} onPress={salvarAlteracoes} disabled={saving}>
+        <Text style={styles.saveButtonText}>{saving ? "Salvando..." : "Salvar Alterações"}</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.editReservasButton}
+        onPress={goToEditarReserva}
+      >
         <Text style={styles.editReservasButtonText}>Minhas Reservas</Text>
       </TouchableOpacity>
 
@@ -88,16 +146,15 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: "#FFDCDC",
     flex: 1,
-    color: "#FFDCDC"
+    color: "#FFDCDC",
   },
   label: {
     fontWeight: "bold",
     marginTop: 15,
     color: "#730C0C",
   },
-  value: {
+  input: {
     borderWidth: 1,
-    borderColor: "#",
     borderRadius: 5,
     padding: 10,
     marginTop: 5,
@@ -105,6 +162,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#F5F5F5",
     marginBottom: 15,
+  },
+  saveButton: {
+    backgroundColor: "#0A84FF",
+    marginTop: 20,
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  saveButtonText: {
+    color: "#FFF",
+    fontWeight: "bold",
+    fontSize: 16,
   },
   logoutButton: {
     backgroundColor: "#FA0505",
@@ -114,7 +183,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoutButtonText: {
-    color: "FD7C7C",
+    color: "#FD7C7C",
     fontWeight: "bold",
     fontSize: 16,
   },
@@ -126,7 +195,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   editReservasButtonText: {
-    color: "FD7C7C",
+    color: "#FD7C7C",
     fontWeight: "bold",
     fontSize: 16,
   },

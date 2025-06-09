@@ -11,7 +11,7 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import sheets from "../axios/axios";
 
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -40,7 +40,7 @@ const TelaDeReservasDoUsuario = () => {
   const carregarDados = async () => {
     setLoading(true);
     try {
-      const id = await AsyncStorage.getItem("idUsuario");
+      const id = await SecureStore.getItemAsync("idUsuario");
       setUserId(id);
 
       if (id) {

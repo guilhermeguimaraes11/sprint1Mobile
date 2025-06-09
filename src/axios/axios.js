@@ -3,7 +3,7 @@ import * as SecureStore from "expo-secure-store";
 
 // Cria a instância do Axios
 const api = axios.create({
-  baseURL: "http://10.89.240.78:5000/reservas/v1/",
+  baseURL: "http://10.89.240.72:5000/reservas/v1/",
   headers: {
     Accept: "application/json",
   },
