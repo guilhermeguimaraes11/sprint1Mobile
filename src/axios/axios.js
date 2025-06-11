@@ -31,11 +31,12 @@ const sheets = {
   getSalas: () => api.get("salas/"),
   getReservas: () => api.get("reservaschedule/"),
   postReserva: (reserva) => api.post("reservaschedule/", reserva),
-  updateReserva: (idReserva, dadosAtualizados) =>
-    api.put(`reservaschedule/${idReserva}`, dadosAtualizados),
+  updateReserva: (idReserva, dadosAtualizados) => api.put(`reservaschedule/${idReserva}`, dadosAtualizados),
   deleteReserva: (idReserva) => api.delete(`reservaschedule/${idReserva}`),
-  getDisponibilidade: (data_inicio, data_fim) =>
-    api.get(`salasdisponiveldata/${data_inicio}/${data_fim}`),
+  getDisponibilidade: (data_inicio, data_fim) => api.get(`salasdisponiveldata/${data_inicio}/${data_fim}`),
+  updateUsuario: (id_usuario, dados) => api.put(`user/${id_usuario}`, dados),
+    
+
 };
 
 export default sheets;
