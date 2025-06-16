@@ -35,6 +35,8 @@ const sheets = {
   deleteReserva: (idReserva) => api.delete(`reservaschedule/${idReserva}`),
   getDisponibilidade: (data_inicio, data_fim) => api.get(`salasdisponiveldata/${data_inicio}/${data_fim}`),
   updateUsuario: (id_usuario, dados) => api.put(`user/${id_usuario}`, dados),
+  deleteUsuario: (id_usuario) => api.delete(`user/${id_usuario}`),
+
     
 
 };

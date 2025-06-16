@@ -29,7 +29,7 @@ export default function Cadastro({ navigation }) {
         console.log(response.data.message);
         AsyncStorage.setItem("token", response.data.token)
         Alert.alert("OK", response.data.message);
-        navigation.navigate("Home");
+        navigation.navigate("Login");
       },
       (error) => {
         Alert.alert("Erro", error.response.data.error); // Exibe um alerta caso ocorra erro
