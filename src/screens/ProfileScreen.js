@@ -24,6 +24,8 @@ export default function PerfilScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalMessage, setModalMessage] = useState("");
+  
+  // Mudar a cor ou o estilo
   const [modalType, setModalType] = useState("info"); // info, success, error
 
   // Modal de confirmação de exclusão
@@ -115,7 +117,7 @@ export default function PerfilScreen({ navigation }) {
         mostrarModal("Erro", "ID do usuário não encontrado.", "error");
         return;
       }
-      const idUsuario = Number(idUsuarioStr);
+      const idUsuario = Number(idUsuarioStr); // Converte o ID para número
 
       const deleteResponse = await api.deleteUsuario(idUsuario);
 
@@ -199,12 +201,12 @@ export default function PerfilScreen({ navigation }) {
             <Text style={styles.modalTitle}>Confirmar Exclusão</Text>
             <Text style={styles.modalText}>Tem certeza que deseja excluir sua conta?</Text>
             <View style={styles.modalActions}>
-              <Pressable onPress={() => setConfirmDeleteModalVisible(false)}>
+              <TouchableOpacity onPress={() => setConfirmDeleteModalVisible(false)}>
                 <Text style={styles.cancelButton}>Cancelar</Text>
-              </Pressable>
-              <Pressable onPress={handleDeletarConta}>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleDeletarConta}>
                 <Text style={styles.confirmButton}>Excluir</Text>
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -269,7 +271,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logoutButtonText: {
-    color: "#FD7C7C",
+    color: "#FFFFFF",
     fontWeight: "bold",
     fontSize: 16,
   },
@@ -281,7 +283,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   editReservasButtonText: {
-    color: "#FD7C7C",
+    color: "#FFFFFF",
     fontWeight: "bold",
     fontSize: 16,
   },
@@ -293,7 +295,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   deleteButtonText: {
-    color: "#FFDCDC",
+    color: "#FFFFFF",
     fontWeight: "bold",
     fontSize: 16,
   },
@@ -329,9 +331,10 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
   cancelButton: {
-    color: "#888",
+    fontWeight: "bold",
     fontSize: 16,
     padding: 10,
+    color: "#FA0505",
   },
   confirmButton: {
     color: "#FA0505",
